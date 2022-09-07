@@ -213,11 +213,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Bruger\\source\\repos\\Learning-Platform-Server_12oo\\Learning-Platform-Server\\Learning-Platform-Server\\Learning-Platform-Server.csproj",
+      "projectUniqueName": "C:\\Users\\Bruger\\Source\\Repos\\Learning-Platform-Server_1212\\Learning-Platform-Server\\Learning-Platform-Server\\Learning-Platform-Server.csproj",
       "projectName": "Learning-Platform-Server",
-      "projectPath": "C:\\Users\\Bruger\\source\\repos\\Learning-Platform-Server_12oo\\Learning-Platform-Server\\Learning-Platform-Server\\Learning-Platform-Server.csproj",
+      "projectPath": "C:\\Users\\Bruger\\Source\\Repos\\Learning-Platform-Server_1212\\Learning-Platform-Server\\Learning-Platform-Server\\Learning-Platform-Server.csproj",
       "packagesPath": "C:\\Users\\Bruger\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Bruger\\source\\repos\\Learning-Platform-Server_12oo\\Learning-Platform-Server\\Learning-Platform-Server\\obj\\",
+      "outputPath": "C:\\Users\\Bruger\\Source\\Repos\\Learning-Platform-Server_1212\\Learning-Platform-Server\\Learning-Platform-Server\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Bruger\\AppData\\Roaming\\NuGet\\NuGet.Config",
