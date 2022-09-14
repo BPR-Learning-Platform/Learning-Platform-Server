@@ -14,7 +14,7 @@ namespace Learning_Platform_Server.Services
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/User";
 
         // GET USER
-        public static async Task<ContentResult> GetUser(SignInRequest signInRequest)
+        public static ContentResult GetUser(SignInRequest signInRequest)
         {
             HttpClient httpClient = new HttpClient();
 
@@ -22,7 +22,7 @@ namespace Learning_Platform_Server.Services
 
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
-            JsonWriterSettings jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            JsonWriterSettings jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.CanonicalExtendedJson };
 
             string? userRootBsonString = response.Result.Content.ReadAsStringAsync().Result;
             BsonArray userRootBsonArray = BsonSerializer.Deserialize<BsonArray>(userRootBsonString);

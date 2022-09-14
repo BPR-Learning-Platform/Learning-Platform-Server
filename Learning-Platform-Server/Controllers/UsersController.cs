@@ -10,9 +10,9 @@ namespace Learning_Platform_Server.Controllers
     public class UsersController : ControllerBase
     {
         [HttpPost("signin")]
-        public async Task<ContentResult> SignIn([FromBody] SignInRequest signInRequest)
+        public ContentResult SignIn([FromBody] SignInRequest signInRequest)
         {
-            return await UserService.GetUser(signInRequest);
+            return UserService.GetUser(signInRequest);
         }
     }
 }
