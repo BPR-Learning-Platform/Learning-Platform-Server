@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "AllowRequestsFromBPR-Learning-Platform-Frontend",
         policy =>
         {
-            policy.WithOrigins("https://bpr-learning-platform.github.io/",
+            policy.WithOrigins("https://bpr-learning-platform.github.io",
                                 "http://localhost:4200")
                     .AllowAnyHeader();
         });
