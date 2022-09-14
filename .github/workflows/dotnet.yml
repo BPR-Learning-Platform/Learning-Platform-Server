@@ -23,3 +23,9 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: resharper
+      uses: glassechidna/resharper-action@master
+      with:
+        solution: Learning-Platform-Server.sln
