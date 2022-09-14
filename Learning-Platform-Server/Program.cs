@@ -1,4 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
+var AllowSpecificOrigins = "_allowRequestsFromBPR-Learning-Platform-Frontend";
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -8,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "AllowRequestsFromBPR-Learning-Platform-Frontend",
+    options.AddPolicy(name: AllowSpecificOrigins,
         policy =>
         {
             policy.WithOrigins("https://bpr-learning-platform.github.io",
@@ -23,6 +25,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors(AllowSpecificOrigins);
 
 app.UseAuthorization();
 
