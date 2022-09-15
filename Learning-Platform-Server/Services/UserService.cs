@@ -1,4 +1,5 @@
-﻿using Learning_Platform_Server.Models;
+﻿using Learning_Platform_Server.Entities;
+using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -32,7 +33,7 @@ namespace Learning_Platform_Server.Services
             string? userRootBsonString = response.Result.Content.ReadAsStringAsync().Result;
             BsonArray userRootBsonArray = BsonSerializer.Deserialize<BsonArray>(userRootBsonString);
 
-            User? user = null;
+            MongoDBUser? mongoDBUser = null;
 
             StatusCodeResult statusCodeResult = new StatusCodeResult(401);
 
@@ -43,16 +44,16 @@ namespace Learning_Platform_Server.Services
                 BsonValue? userRootBson = userRootBsonArray[0];
                 string? userRootJson = userRootBson.ToJson(jsonWriterSettings);
                 UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
-                user = userRoot?.User;
+                mongoDBUser = userRoot?.User;
 
-                if (user != null)
+                if (mongoDBUser != null)
                 {
                     statusCodeResult = new StatusCodeResult(200);
                 }
 
             }
 
-            string msg = statusCodeResult.StatusCode == 200 ? user.Email : "No user was found with the given credentials";
+            string? msg = statusCodeResult.StatusCode == 200 ? mongoDBUser.Email : "No user was found with the given credentials";
 
             Console.WriteLine(msg);
 
