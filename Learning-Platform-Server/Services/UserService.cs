@@ -21,13 +21,13 @@ namespace Learning_Platform_Server.Services
         // GET USER
         public ContentResult GetUser(SignInRequest signInRequest)
         {
-            HttpClient httpClient = new HttpClient();
+            HttpClient httpClient = new();
 
-            HttpRequestMessage? request = new HttpRequestMessage(new HttpMethod("GET"), Url + "?Email=" + signInRequest.email + "&Password=" + signInRequest.password);
+            HttpRequestMessage? request = new(new HttpMethod("GET"), Url + "?Email=" + signInRequest.Email + "&Password=" + signInRequest.Password);
 
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
-            JsonWriterSettings jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.CanonicalExtendedJson };
+            JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };
 
             string? userRootBsonString = response.Result.Content.ReadAsStringAsync().Result;
             BsonArray userRootBsonArray = BsonSerializer.Deserialize<BsonArray>(userRootBsonString);
@@ -52,7 +52,7 @@ namespace Learning_Platform_Server.Services
 
             }
 
-            string msg = statusCodeResult.StatusCode == 200 ? user.email : "No user was found with the given credentials";
+            string msg = statusCodeResult.StatusCode == 200 ? user.Email : "No user was found with the given credentials";
 
             Console.WriteLine(msg);
 

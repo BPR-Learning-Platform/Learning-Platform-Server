@@ -6,16 +6,16 @@ namespace Learning_Platform_Server.Models
     public class Id
     {
         [JsonProperty("$oid")]
-        public string Oid { get; set; }
+        public string? Oid { get; set; }
     }
 
     public class UserRoot
     {
-        public Id _id { get; set; }
+        public Id? Id { get; set; }
 
-        public Timestamp? timeStamp { get; set; }
+        public Timestamp? TimeStamp { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 
     public class Timestamp
@@ -27,64 +27,60 @@ namespace Learning_Platform_Server.Models
     public class User
     {
         public List<int>? assignedGradeIdList;
-        public int? score { get; set; }
+        public int? Score { get; set; }
 
-        public string? type { get; set; }
-        public string email { get; set; }
+        public string? Type { get; set; }
+        public string? Email { get; set; }
 
-        public string? name { get; set; }
-        public string password { get; set; }
+        public string? Name { get; set; }
+        public string? Password { get; set; }
 
 
-        public string? userId { get; set; }
+        public string? UserId { get; set; }
 
         public override string ToString()
         {
-            return "UserId: " + userId + "\t pw: " + password;
+            return "UserId: " + UserId + "\t pw: " + Password;
         }
     }
 
     public class MongoDBUser
     {
-        public string name { get; set; }
+        public string? Name { get; set; }
 
         //public string userId { get; set; }
-        public string email { get; set; }
-        public string password { get; set; }
-        public List<int> assignedGradeIds { get; set; }
-        public string type { get; set; }
-        public int score { get; set; }
+        public string? Email { get; set; }
+        public string Password { get; set; }
+        public List<int>? AssignedGradeIds { get; set; }
+        public string? Type { get; set; }
+        public int? Score { get; set; }
 
 
         public MongoDBUser(User user)
         {
             //this.userId = user.userId;
-            this.name = user.name;
-            this.email = user.email;
-            this.password = user.password;
-            this.assignedGradeIds = user.assignedGradeIdList;
-            this.type = user.type;
-            this.score = (int)user.score;
+            this.Name = user.Name;
+            this.Email = user.Email;
+            this.Password = user.Password;
+            this.AssignedGradeIds = user.assignedGradeIdList;
+            this.Type = user.Type;
+            this.Score = (int)user.Score;
         }
 
         public override string ToString()
         {
-            return "name: " + name +
-                ", \t pw: " + password +
-                ", \t assignedGradeIds: " + assignedGradeIds +
-                ", \t type: " + type +
-                ", \t score: " + score;
+            return "name: " + Name +
+                ", \t pw: " + Password +
+                ", \t assignedGradeIds: " + AssignedGradeIds +
+                ", \t type: " + Type +
+                ", \t score: " + Score;
         }
     }
 
     public class SignInRequest
     {
-        public string email { get; set; }
-        public string password { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
     }
-
-
-
-
 }
 
