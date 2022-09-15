@@ -9,12 +9,17 @@ using System.Text;
 
 namespace Learning_Platform_Server.Services
 {
-    public class UserService
+    public interface IUserService
+    {
+        ContentResult GetUser(SignInRequest signInRequest);
+    }
+
+    public class UserService : IUserService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/User";
 
         // GET USER
-        public static ContentResult GetUser(SignInRequest signInRequest)
+        public ContentResult GetUser(SignInRequest signInRequest)
         {
             HttpClient httpClient = new HttpClient();
 
