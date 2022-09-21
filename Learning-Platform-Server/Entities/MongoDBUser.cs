@@ -6,7 +6,7 @@ namespace Learning_Platform_Server.Entities
     public class UserRoot
     {
         public Id? Id { get; set; }
-        public MongoDBUser? User { get; set; }
+        public MongoDbUser? User { get; set; }
     }
 
     public class Id
@@ -15,7 +15,7 @@ namespace Learning_Platform_Server.Entities
         public string? Oid { get; set; }
     }
 
-    public class MongoDBUser
+    public class MongoDbUser
     {
         public string? UserId { get; set; }
         public string? Type { get; set; }

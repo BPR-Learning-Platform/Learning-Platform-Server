@@ -13,7 +13,7 @@ namespace Learning_Platform_Server.Models.Users
         public List<int>? AssignedGradeIdList { get; set; }
 
 
-        public UserModel(MongoDBUser user)
+        public UserModel(MongoDbUser user)
         {
             UserId = user.UserId;
             Type = user.Type;
