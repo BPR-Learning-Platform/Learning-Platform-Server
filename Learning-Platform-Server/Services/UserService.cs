@@ -5,7 +5,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json.Linq;
-using System.Net;
 using System.Text;
 
 namespace Learning_Platform_Server.Services
@@ -13,13 +12,14 @@ namespace Learning_Platform_Server.Services
     public interface IUserService
     {
         ContentResult GetUser(SignInRequest signInRequest);
+        UserModel GetById(int userId);
     }
 
     public class UserService : IUserService
     {
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/User";
+        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
-        // GET USER
+        // SIGN IN USER
         public ContentResult GetUser(SignInRequest signInRequest)
         {
             HttpClient httpClient = new();
@@ -59,5 +59,14 @@ namespace Learning_Platform_Server.Services
 
             return new ContentResult() { Content = msg.ToJson(), StatusCode = statusCodeResult.StatusCode };
         }
+
+        // GET BY ID
+
+        public UserModel GetById(int userId)
+        {
+            throw new NotImplementedException(); // TODO
+        }
+
+
     }
 }

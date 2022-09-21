@@ -1,7 +1,6 @@
 ﻿using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Learning_Platform_Server.Controllers
 {
