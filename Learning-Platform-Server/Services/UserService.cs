@@ -23,7 +23,7 @@ namespace Learning_Platform_Server.Services
             HttpClient httpClient = new();
 
             HttpRequestMessage? request = new(new HttpMethod("POST"), Url + "/Signin");
-            request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(signInRequest), Encoding.UTF8, "application/json");
+            request.Content = JsonContent.Create(signInRequest);
             
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
