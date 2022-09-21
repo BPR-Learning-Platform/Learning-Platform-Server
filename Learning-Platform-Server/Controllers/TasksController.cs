@@ -19,8 +19,8 @@ namespace Learning_Platform_Server.Controllers
             _userService = userService;
         }
 
-        [HttpGet("{userid:int}")]
-        public ActionResult<IEnumerable<TaskResponse>> GetAll(int userid)
+        [HttpGet]
+        public ActionResult<IEnumerable<TaskResponse>> GetAll([FromQuery] string userid)
         {
             // TODO: UserModel userModel = _userService.GetById(userid);
 
