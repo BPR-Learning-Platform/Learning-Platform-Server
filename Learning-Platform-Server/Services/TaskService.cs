@@ -38,7 +38,7 @@ namespace Learning_Platform_Server.Services
             {
                 string? taskJson = taskBson.ToJson(jsonWriterSettings);
                 TaskRoot taskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskRoot>(taskJson);
-                taskList.Add(new TaskResponse(taskRoot.Step));
+                taskList.Add(new TaskResponse(taskRoot.Task));
             }
 
             return taskList;
