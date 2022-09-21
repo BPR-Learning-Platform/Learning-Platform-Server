@@ -15,14 +15,14 @@ namespace Learning_Platform_Server.Services
 
     public class UserService : IUserService
     {
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/User";
+        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
         // POST USER
         public ContentResult PostUser(SignInRequest signInRequest)
         {
             HttpClient httpClient = new();
 
-            HttpRequestMessage? request = new(new HttpMethod("POST"), Url + "/Signin");
+            HttpRequestMessage? request = new(new HttpMethod("POST"), Url + "/signin");
             request.Content = JsonContent.Create(signInRequest);
             
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
