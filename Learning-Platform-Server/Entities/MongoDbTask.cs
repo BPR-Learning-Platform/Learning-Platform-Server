@@ -6,7 +6,7 @@ namespace Learning_Platform_Server.Entities
     public class TaskRoot
     {
         public Id? Id { get; set; }
-        public MongoDbTask? Step { get; set; } //TODO: Should be called Task in MongoDb instead, and thereafter changed here as well
+        public MongoDbTask? Task { get; set; }
     }
 
     public class MongoDbTask
