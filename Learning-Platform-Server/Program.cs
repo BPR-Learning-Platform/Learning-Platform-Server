@@ -1,14 +1,21 @@
+using Learning_Platform_Server.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 var AllowSpecificOrigins = "_allowRequestsFromBPR-Learning-Platform-Frontend";
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var services = builder.Services;
 
-builder.Services.AddCors(options =>
+services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+
+// configure DI for application services
+services.AddScoped<IUserService, UserService>();
+
+services.AddCors(options =>
 {
     options.AddPolicy(name: AllowSpecificOrigins,
         policy =>

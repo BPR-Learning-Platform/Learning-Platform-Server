@@ -18,7 +18,7 @@ namespace Learning_Platform_Server.Tests
     {
         private const string RequestUriSignIn = "/users/signin";
         private const string MediaType = "application/json";
-        Encoding uTF8 = Encoding.UTF8;
+        private readonly Encoding uTF8 = Encoding.UTF8;
         private readonly ITestOutputHelper output;
 
         public UsersControllerTests(ITestOutputHelper output)
@@ -27,7 +27,7 @@ namespace Learning_Platform_Server.Tests
         }
 
 
-        // sign IN
+        // SIGN IN
 
         [Fact]
         public async Task sign_IN_existing_user_with_valid_credentials_receives_200_OK()
@@ -35,11 +35,11 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            StringContent stringContent = new StringContent(@"{""Email"": ""Teacher1@Teacher.com"", ""Password"": ""12345678"" }", uTF8, MediaType);
+            StringContent stringContent = new(@"{""Email"": ""Teacher1@Teacher.com"", ""Password"": ""12345678"" }", uTF8, MediaType);
 
             HttpResponseMessage? responseMsg = await client.PostAsync(RequestUriSignIn, stringContent);
-            //output.WriteLine("Statuscode:" + responseMsg.StatusCode);
-            //output.WriteLine(stringContent.ReadAsStringAsync().Result);
+            output.WriteLine("Statuscode:" + responseMsg.StatusCode);
+            output.WriteLine(stringContent.ReadAsStringAsync().Result);
 
             responseMsg.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -50,7 +50,7 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            StringContent stringContent = new StringContent(@"{""Email"": ""noone@email.dk"", ""Password"": ""12345678"" }", uTF8, MediaType);
+            StringContent stringContent = new(@"{""Email"": ""noone@email.dk"", ""Password"": ""12345678"" }", uTF8, MediaType);
             HttpResponseMessage? responseMsg = await client.PostAsync(RequestUriSignIn, stringContent);
 
             responseMsg.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -62,7 +62,7 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            StringContent stringContent = new StringContent(@"{""Email"": ""Teacher1@Teacher.com"", ""Password"": ""wrongpassword"" }", uTF8, MediaType);
+            StringContent stringContent = new(@"{""Email"": ""Teacher1@Teacher.com"", ""Password"": ""wrongpassword"" }", uTF8, MediaType);
             HttpResponseMessage? responseMsg = await client.PostAsync(RequestUriSignIn, stringContent);
 
             responseMsg.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
