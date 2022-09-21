@@ -11,20 +11,21 @@ namespace Learning_Platform_Server.Services
     public interface IUserService
     {
         ContentResult PostUser(SignInRequest signInRequest);
+        UserModel GetById(int userId);
     }
 
     public class UserService : IUserService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
-        // POST USER
+        // SIGN IN
         public ContentResult PostUser(SignInRequest signInRequest)
         {
             HttpClient httpClient = new();
 
             HttpRequestMessage? request = new(new HttpMethod("POST"), Url + "/signin");
             request.Content = JsonContent.Create(signInRequest);
-            
+
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
             JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };
@@ -55,5 +56,14 @@ namespace Learning_Platform_Server.Services
 
             return new ContentResult() { Content = msg, StatusCode = statusCodeResult.StatusCode };
         }
+
+        // GET BY ID
+
+        public UserModel GetById(int userId)
+        {
+            throw new NotImplementedException(); // TODO
+        }
+
+
     }
 }
