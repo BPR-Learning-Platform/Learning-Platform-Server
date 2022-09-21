@@ -21,7 +21,6 @@ namespace Learning_Platform_Server.Entities
         public string? Type { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; }
         public int? Score { get; set; }
         public List<int>? AssignedGradeIds;
 
@@ -31,7 +30,6 @@ namespace Learning_Platform_Server.Entities
                 "\t, type: " + Type +
                 "\t, name: " + Name +
                 "\t, email: " + Email +
-                "\t, password: " + Password +
                 "\t, score: " + Score;
             //"\t, assignedGradeIds: " + AssignedGradeIds;
 

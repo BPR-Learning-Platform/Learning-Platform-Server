@@ -38,8 +38,6 @@ namespace Learning_Platform_Server.Services
 
             if (userRootBsonArray.Count != 0)
             {
-                statusCodeResult = new StatusCodeResult(200);
-
                 BsonValue? userRootBson = userRootBsonArray[0];
                 string? userRootJson = userRootBson.ToJson(jsonWriterSettings);
                 UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
@@ -49,14 +47,13 @@ namespace Learning_Platform_Server.Services
                 {
                     statusCodeResult = new StatusCodeResult(200);
                 }
-
             }
 
-            string? msg = statusCodeResult.StatusCode == 200 ? mongoDbUser?.Name : "No user was found with the given credentials";
+            string? msg = statusCodeResult.StatusCode == 200 ? mongoDbUser.ToJson() : "No user was found with the given credentials";
 
             Console.WriteLine(msg);
 
-            return new ContentResult() { Content = msg.ToJson(), StatusCode = statusCodeResult.StatusCode };
+            return new ContentResult() { Content = msg, StatusCode = statusCodeResult.StatusCode };
         }
     }
 }

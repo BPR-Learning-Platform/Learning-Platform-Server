@@ -19,7 +19,6 @@ namespace Learning_Platform_Server.Models.Users
             Type = user.Type;
             Name = user.Name;
             Email = user.Email;
-            Password = user.Password;
             Score = user.Score;
             AssignedGradeIdList = user.AssignedGradeIds;
         }
