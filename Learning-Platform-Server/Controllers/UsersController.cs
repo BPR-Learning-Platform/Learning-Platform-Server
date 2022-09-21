@@ -18,7 +18,7 @@ namespace Learning_Platform_Server.Controllers
         [HttpPost("signin")]
         public ContentResult SignIn([FromBody] SignInRequest signInRequest)
         {
-            return _userService.GetUser(signInRequest);
+            return _userService.PostUser(signInRequest);
         }
     }
 }
