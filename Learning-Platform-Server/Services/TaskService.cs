@@ -23,7 +23,7 @@ namespace Learning_Platform_Server.Services
         {
             HttpClient httpClient = new();
 
-            HttpRequestMessage? request = new(new HttpMethod("GET"), Url + "?Step=" + step);
+            HttpRequestMessage? request = new(new HttpMethod("GET"), Url + "?step=" + step);
 
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
