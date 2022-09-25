@@ -5,28 +5,33 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using Newtonsoft.Json.Linq;
+using System.Net;
 using System.Text;
 
 namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetAll(int step);
+        List<TaskResponse>? GetAll(int step);
     }
 
     public class TaskService : ITaskService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/task";
 
-        public List<TaskResponse> GetAll(int step)
+        public List<TaskResponse>? GetAll(int step)
         {
             HttpClient httpClient = new();
             HttpRequestMessage? httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
             HttpResponseMessage? httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
 
+            List<TaskResponse> taskList = new();
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                return null;
+
             BsonArray taskRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
 
-            List<TaskResponse> taskList = new();
             foreach (BsonValue? taskRootBsonValue in taskRootBsonArray)
             {
                 MongoDbTask? mongoDbTask = MapToMongoDbTask(taskRootBsonValue);

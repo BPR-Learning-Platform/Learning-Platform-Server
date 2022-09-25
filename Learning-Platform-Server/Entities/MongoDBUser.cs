@@ -5,7 +5,7 @@ namespace Learning_Platform_Server.Entities
 {
     public class UserRoot
     {
-        public Id? Id { get; set; }
+        public Id? _id { get; set; }
         public MongoDbUser? User { get; set; }
     }
 

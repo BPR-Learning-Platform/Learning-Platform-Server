@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
+using System.Net;
 using System.Text;
 
 namespace Learning_Platform_Server.Services
@@ -11,7 +12,7 @@ namespace Learning_Platform_Server.Services
     public interface IUserService
     {
         ContentResult PostUser(SignInRequest signInRequest);
-        UserModel GetById(int userId);
+        UserResponse? GetById(string id);
     }
 
     public class UserService : IUserService
@@ -28,8 +29,6 @@ namespace Learning_Platform_Server.Services
 
             Task<HttpResponseMessage>? response = httpClient.SendAsync(request);
 
-            JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };
-
             string? userRootBsonString = response.Result.Content.ReadAsStringAsync().Result;
             BsonArray userRootBsonArray = BsonSerializer.Deserialize<BsonArray>(userRootBsonString);
 
@@ -40,7 +39,7 @@ namespace Learning_Platform_Server.Services
             if (userRootBsonArray.Count != 0)
             {
                 BsonValue? userRootBson = userRootBsonArray[0];
-                string? userRootJson = userRootBson.ToJson(jsonWriterSettings);
+                string? userRootJson = Util.MapToJson(userRootBson);
                 UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
                 mongoDbUser = userRoot?.User;
 
@@ -59,11 +58,59 @@ namespace Learning_Platform_Server.Services
 
         // GET BY ID
 
-        public UserModel GetById(int userId)
+        public UserResponse? GetById(string id)
         {
-            throw new NotImplementedException(); // TODO
+            HttpClient httpClient = new();
+            HttpRequestMessage? httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
+            HttpResponseMessage? httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                return null;
+
+            BsonArray userRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
+
+            if (userRootBsonArray.Count != 0)
+            {
+                BsonValue? userRootBsonValue = userRootBsonArray[0];
+
+                MongoDbUser? mongoDbUser = MapToMongoDbUser(userRootBsonValue);
+                if (mongoDbUser is null)
+                    return null;
+
+                UserResponse? userResponse = MapToUserResponse(mongoDbUser);
+
+                return userResponse;
+            }
+            return null;
         }
 
+        private MongoDbUser? MapToMongoDbUser(BsonValue userRootBsonValue)
+        {
+            string? userRootJson = Util.MapToJson(userRootBsonValue);
 
+            if (userRootJson is null)
+            {
+                Console.WriteLine("userRootJson is null.");
+                return null;
+            }
+
+
+            UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
+
+            return userRoot?.User;
+        }
+
+        private static UserResponse? MapToUserResponse(MongoDbUser mongoDbUser)
+        {
+            return new UserResponse()
+            {
+                UserId = mongoDbUser.UserId,
+                Type = mongoDbUser.Type,
+                Name = mongoDbUser.Name,
+                Email = mongoDbUser.Email,
+                Score = mongoDbUser.Score,
+                AssignedGradeIds = mongoDbUser.AssignedGradeIds
+            };
+        }
     }
 }
