@@ -21,9 +21,8 @@ namespace Learning_Platform_Server.Services
 
         public List<TaskResponse>? GetAll(int step)
         {
-            HttpClient httpClient = new();
-            HttpRequestMessage? httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
-            HttpResponseMessage? httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
+            HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
             List<TaskResponse> taskList = new();
 
@@ -32,7 +31,7 @@ namespace Learning_Platform_Server.Services
 
             BsonArray taskRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
 
-            foreach (BsonValue? taskRootBsonValue in taskRootBsonArray)
+            foreach (BsonValue taskRootBsonValue in taskRootBsonArray)
             {
                 MongoDbTask? mongoDbTask = MapToMongoDbTask(taskRootBsonValue);
                 if (mongoDbTask is null)

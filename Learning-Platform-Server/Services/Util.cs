@@ -20,5 +20,10 @@ namespace Learning_Platform_Server.Services
                 return bsonValue.ToJson(jsonWriterSettings);
             }
         }
+
+        public static HttpClient GetHttpClient()
+        {
+            return new();
+        }
     }
 }

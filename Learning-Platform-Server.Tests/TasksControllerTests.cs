@@ -30,7 +30,7 @@ namespace Learning_Platform_Server.Tests
         // GET ALL
 
         [Fact]
-        public async Task get_all_receives_200_OK_with_multiple_objects_of_expected_type()
+        public async Task Get_all_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();

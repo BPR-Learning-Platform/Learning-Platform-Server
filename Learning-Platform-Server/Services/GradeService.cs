@@ -25,9 +25,8 @@ namespace Learning_Platform_Server.Services
 
         public GradeResponse? GetById(int id)
         {
-            HttpClient httpClient = new();
-            HttpRequestMessage? httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
-            HttpResponseMessage? httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
+            HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
                 return null;
@@ -36,7 +35,7 @@ namespace Learning_Platform_Server.Services
 
             if (gradeRootBsonArray.Count != 0)
             {
-                BsonValue? gradeRootBsonValue = gradeRootBsonArray[0];
+                BsonValue gradeRootBsonValue = gradeRootBsonArray[0];
 
                 MongoDbGrade? mongoDbGrade = MapToMongoDbGrade(gradeRootBsonValue);
                 if (mongoDbGrade is null)
@@ -49,7 +48,11 @@ namespace Learning_Platform_Server.Services
             return null;
         }
 
-        private MongoDbGrade? MapToMongoDbGrade(BsonValue gradeRootBsonValue)
+
+
+        // helper methods
+
+        private static MongoDbGrade? MapToMongoDbGrade(BsonValue gradeRootBsonValue)
         {
             string? gradeRootJson = Util.MapToJson(gradeRootBsonValue);
 
