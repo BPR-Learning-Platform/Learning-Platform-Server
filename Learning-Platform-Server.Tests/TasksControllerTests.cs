@@ -18,7 +18,7 @@ namespace Learning_Platform_Server.Tests
 {
     public class TasksControllerTests
     {
-        private const string TasksUrl = "/Tasks?userid=";
+        private const string TasksUrl = "/tasks?";
         private readonly ITestOutputHelper _output;
 
         public TasksControllerTests(ITestOutputHelper output)
@@ -30,14 +30,14 @@ namespace Learning_Platform_Server.Tests
         // GET ALL
 
         [Fact]
-        public async Task Get_all_receives_200_OK_with_multiple_objects_of_expected_type()
+        public async Task Get_batch_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
             string userId = "1";
 
-            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + userId);
+            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "userid=" + userId + "correct=" + 1);
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
             string? responseContentString = httpResponseMessage.Content.ReadAsStringAsync().Result;

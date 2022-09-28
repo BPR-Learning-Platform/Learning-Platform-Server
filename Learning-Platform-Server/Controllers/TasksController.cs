@@ -23,39 +23,8 @@ namespace Learning_Platform_Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TaskResponse>> GetAll([FromQuery] string userid)
+        public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct)
         {
-
-            // TODO // Test when database endpoints are ready
-            /*
-            // USER
-            UserResponse? userResponse = _userService.GetById(userid);
-            if (userResponse is null)
-                return StatusCode(StatusCodes.Status404NotFound, "No user was found with userid " + userid);
-
-            // GRADE
-            List<int>? gradeIdList = userResponse.AssignedGradeIds;
-            if (gradeIdList is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No assignedgradeids were found for user with userid " + userid);
-
-            int gradeId = gradeIdList[0];
-            GradeResponse? gradeResponse = _gradeService.GetById(gradeId);
-
-            if (gradeResponse is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No grade was found for gradeid " + gradeId);
-
-            // STEP
-            if (gradeResponse.Step is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No step was found for grade with gradeid " + gradeId);
-
-            // TASK
-            int step = (int)gradeResponse.Step;
-            List<TaskResponse>? taskResponseList = _taskService.GetAll(step);
-
-            if (taskResponseList is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No tasks were found for step " + step);
-            */
-
             List<TaskResponse>? taskResponseList = _taskService.GetAll(1); // TODO: remove hardcode
 
             return Ok(taskResponseList);
