@@ -34,7 +34,7 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            JsonContent content = JsonContent.Create(new { email = "student20@student.com", password = "12345678" });
+            JsonContent content = JsonContent.Create(new { email = "student3@student.com", password = "12345678" });
 
             HttpResponseMessage? responseMsg = await client.PostAsync(SignInUrl, content);
             _output.WriteLine("Statuscode:" + responseMsg.StatusCode);

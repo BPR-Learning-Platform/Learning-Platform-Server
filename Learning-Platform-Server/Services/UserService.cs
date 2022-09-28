@@ -11,7 +11,7 @@ namespace Learning_Platform_Server.Services
 {
     public interface IUserService
     {
-        ContentResult SignInUser(SignInRequest signInRequest);
+        KeyValuePair<ContentResult, UserResponse?> SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
     }
 
@@ -20,7 +20,7 @@ namespace Learning_Platform_Server.Services
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
         // SIGN IN
-        public ContentResult SignInUser(SignInRequest signInRequest)
+        public KeyValuePair<ContentResult, UserResponse?> SignInUser(SignInRequest signInRequest)
         {
             HttpRequestMessage request = new(new HttpMethod("POST"), Url + "/signin")
             {
@@ -30,20 +30,43 @@ namespace Learning_Platform_Server.Services
             HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(request).Result;
             BsonArray userRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
             if (userRootBsonArray.Count == 0)
-                return new ContentResult() { StatusCode = StatusCodes.Status401Unauthorized, Content = "No user was found with the given credentials" }; ;
+            {
+                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "No user was found with the given credentials"
+                }, null);
+            }
 
             BsonValue userRootBson = userRootBsonArray[0];
             string? userRootJson = Util.MapToJson(userRootBson);
             if (userRootJson is null)
-                return new ContentResult() { StatusCode = StatusCodes.Status500InternalServerError, Content = "Could not read user information from BsonValue" };
+            {
+                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Content = "Could not read user information from BsonValue"
+                }, null);
+            }
 
             UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
             MongoDbUser? mongoDbUser = userRoot?.User;
             if (mongoDbUser is null)
-                return new ContentResult() { StatusCode = StatusCodes.Status500InternalServerError, Content = "Could not read user from userRoot" };
+            {
+                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Content = "Could not read user from userRoot"
+                }, null);
+            }
 
             UserResponse userResponse = MapToUserResponse(mongoDbUser);
-            return new ContentResult() { StatusCode = StatusCodes.Status200OK, Content = userResponse.ToJson() };
+
+            return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Content = ""
+            }, userResponse);
         }
 
         // GET BY ID
