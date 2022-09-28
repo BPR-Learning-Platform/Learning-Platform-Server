@@ -5,7 +5,7 @@ namespace Learning_Platform_Server.Entities
 {
     public class UserRoot
     {
-        public Id? Id { get; set; }
+        public Id? _id { get; set; }
         public MongoDbUser? User { get; set; }
     }
 
@@ -27,11 +27,11 @@ namespace Learning_Platform_Server.Entities
         public override string ToString()
         {
             return "MongoDBUser: userid: " + UserId +
-                "\t, type: " + Type +
-                "\t, name: " + Name +
-                "\t, email: " + Email +
-                "\t, score: " + Score;
-            //"\t, assignedGradeIds: " + AssignedGradeIds;
+                ", type: " + Type +
+                ", name: " + Name +
+                ", email: " + Email +
+                ", score: " + Score;
+            //", assignedGradeIds: " + AssignedGradeIds;
 
         }
     }

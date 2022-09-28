@@ -15,6 +15,7 @@ services.AddSwaggerGen();
 // configure DI for application services
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ITaskService, TaskService>();
+services.AddScoped<IGradeService, GradeService>();
 
 services.AddCors(options =>
 {
