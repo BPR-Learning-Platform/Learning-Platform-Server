@@ -8,7 +8,6 @@ namespace Learning_Platform_Server.Models.Users
         public string? Type { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; }
         public int? Score { get; set; }
         public List<int>? AssignedGradeIds { get; set; }
 
@@ -18,7 +17,6 @@ namespace Learning_Platform_Server.Models.Users
                 ", type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
-                ", password: " + Password +
                 ", score: " + Score;
             //"\t, assignedGradeIds: " + AssignedGradeIds;
         }
