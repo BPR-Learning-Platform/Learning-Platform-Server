@@ -5,7 +5,8 @@ namespace Learning_Platform_Server.Entities
 {
     public class TaskRoot
     {
-        public Id? _id { get; set; }
+        [JsonProperty("_id")]
+        public Id? Id { get; set; }
         public MongoDbTask? Task { get; set; }
     }
 

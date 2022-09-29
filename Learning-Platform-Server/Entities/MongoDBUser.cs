@@ -3,21 +3,31 @@ using System.Runtime.Serialization;
 
 namespace Learning_Platform_Server.Entities
 {
-    public class UserRoot
+    public class MongoDbUserRoot
     {
-        public Id? _id { get; set; }
+        [JsonProperty("_id")]
+        public Id? Id { get; set; }
         public MongoDbUser? User { get; set; }
+        public UserId? UserId { get; set; }
+        public override string ToString() => "MongoDbUserRoot: Oid: " + Id + ", " + User + ", UserId: " + UserId;
     }
 
     public class Id
     {
         [JsonProperty("$oid")]
         public string? Oid { get; set; }
+        public override string ToString() => Oid + "";
+    }
+
+    public class UserId
+    {
+        [JsonProperty("$numberLong")]
+        public string? NumberLong { get; set; }
+        public override string ToString() => NumberLong + "";
     }
 
     public class MongoDbUser
     {
-        public string? UserId { get; set; }
         public string? Type { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
@@ -26,8 +36,7 @@ namespace Learning_Platform_Server.Entities
 
         public override string ToString()
         {
-            return "MongoDBUser: userid: " + UserId +
-                ", type: " + Type +
+            return "MongoDBUser: type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
                 ", score: " + Score;
