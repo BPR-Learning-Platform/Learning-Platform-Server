@@ -27,8 +27,8 @@ namespace Learning_Platform_Server.Services
                 Content = JsonContent.Create(signInRequest)
             };
 
-            HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(request).Result;
-            BsonArray userRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
+            BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
             if (userRootBsonArray.Count == 0)
             {
                 return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
@@ -63,7 +63,7 @@ namespace Learning_Platform_Server.Services
 
             return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
             {
-                StatusCode = StatusCodes.Status500InternalServerError,
+                StatusCode = StatusCodes.Status200OK,
                 Content = ""
             }, userResponse);
         }
@@ -73,12 +73,15 @@ namespace Learning_Platform_Server.Services
         public UserResponse? GetById(string id)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
-            HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
+            // TEMPORARY exception message //TODO
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                return null;
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ". " +
+                    "A 'NotFound' statuscode is expected from the database if endpoint /user?id=... does not exist (yet). " +
+                    "If you're trying to get tasks, you can probably solve this error by posting a signin request for the user (will only work until the cache expires though).");
 
-            BsonArray userRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
+            BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
             if (userRootBsonArray.Count != 0)
             {
@@ -103,7 +106,7 @@ namespace Learning_Platform_Server.Services
 
         private static MongoDbUserRoot? MapToMongoDbUserRoot(BsonValue userRootBsonValue)
         {
-            string? userRootJson = Util.MapToJson(userRootBsonValue);
+            string? userRootJson = MongoDbHelper.MapToJson(userRootBsonValue);
 
             if (userRootJson is null)
             {

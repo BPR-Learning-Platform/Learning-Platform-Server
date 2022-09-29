@@ -22,14 +22,14 @@ namespace Learning_Platform_Server.Services
         public List<TaskResponse>? GetAll(int step)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
-            HttpResponseMessage httpResponseMessage = Util.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
                 return null;
 
-            BsonArray taskRootBsonArray = Util.MapToBsonArray(httpResponseMessage);
+            BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
             foreach (BsonValue taskRootBsonValue in taskRootBsonArray)
             {
@@ -54,7 +54,7 @@ namespace Learning_Platform_Server.Services
 
         private static MongoDbTask? MapToMongoDbTask(BsonValue taskRootBsonValue)
         {
-            string? taskRootJson = Util.MapToJson(taskRootBsonValue);
+            string? taskRootJson = MongoDbHelper.MapToJson(taskRootBsonValue);
 
             if (taskRootJson is null)
             {
