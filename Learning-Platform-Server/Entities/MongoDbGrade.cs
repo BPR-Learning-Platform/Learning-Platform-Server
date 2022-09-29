@@ -5,7 +5,8 @@ namespace Learning_Platform_Server.Entities
 {
     public class GradeRoot
     {
-        public Id? _id { get; set; }
+        [JsonProperty("_id")]
+        public Id? Id { get; set; }
         public MongoDbGrade? Grade { get; set; }
     }
 

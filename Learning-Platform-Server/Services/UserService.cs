@@ -38,9 +38,10 @@ namespace Learning_Platform_Server.Services
                 }, null);
             }
 
-            BsonValue userRootBson = userRootBsonArray[0];
-            string? userRootJson = Util.MapToJson(userRootBson);
-            if (userRootJson is null)
+            BsonValue userRootBsonValue = userRootBsonArray[0];
+
+            MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
+            if (mongoDbUserRoot is null)
             {
                 return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
                 {
@@ -49,18 +50,16 @@ namespace Learning_Platform_Server.Services
                 }, null);
             }
 
-            UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
-            MongoDbUser? mongoDbUser = userRoot?.User;
-            if (mongoDbUser is null)
+            if (mongoDbUserRoot is null)
             {
                 return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
                 {
                     StatusCode = StatusCodes.Status500InternalServerError,
-                    Content = "Could not read user from userRoot"
+                    Content = "Could not read mongoDbUserRoot from userRootJson"
                 }, null);
             }
 
-            UserResponse userResponse = MapToUserResponse(mongoDbUser);
+            UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
 
             return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
             {
@@ -85,11 +84,14 @@ namespace Learning_Platform_Server.Services
             {
                 BsonValue userRootBsonValue = userRootBsonArray[0];
 
-                MongoDbUser? mongoDbUser = MapToMongoDbUser(userRootBsonValue);
-                if (mongoDbUser is null)
+                MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
+                if (mongoDbUserRoot is null)
+                {
+                    Console.WriteLine("UserRoot was not found");
                     return null;
+                }
 
-                UserResponse? userResponse = MapToUserResponse(mongoDbUser);
+                UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
 
                 return userResponse;
             }
@@ -99,32 +101,45 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        private static MongoDbUser? MapToMongoDbUser(BsonValue userRootBsonValue)
+        private static MongoDbUserRoot? MapToMongoDbUserRoot(BsonValue userRootBsonValue)
         {
             string? userRootJson = Util.MapToJson(userRootBsonValue);
 
             if (userRootJson is null)
             {
-                Console.WriteLine("userRootJson is null.");
+                Console.WriteLine("userRootJson is null");
                 return null;
             }
 
+            MongoDbUserRoot? mongoDbUserRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbUserRoot>(userRootJson);
 
-            UserRoot? userRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRoot>(userRootJson);
+            Console.WriteLine("Mapping complete, found: " + mongoDbUserRoot);
 
-            return userRoot?.User;
+            return mongoDbUserRoot;
         }
 
-        private static UserResponse MapToUserResponse(MongoDbUser mongoDbUser)
+        private static UserResponse? MapToUserResponse(MongoDbUserRoot mongoDbUserRoot)
         {
+            if (mongoDbUserRoot.User is null)
+            {
+                Console.WriteLine("User was not found in mongoDbUserRoot");
+                return null;
+            }
+
+            if (mongoDbUserRoot.UserId is null)
+            {
+                Console.WriteLine("UserId was not found in mongoDbUserRoot");
+                return null;
+            }
+
             return new UserResponse()
             {
-                UserId = mongoDbUser.UserId,
-                Type = mongoDbUser.Type,
-                Name = mongoDbUser.Name,
-                Email = mongoDbUser.Email,
-                Score = mongoDbUser.Score,
-                AssignedGradeIds = mongoDbUser.AssignedGradeIds
+                UserId = mongoDbUserRoot.UserId.NumberLong,
+                Type = mongoDbUserRoot.User.Type,
+                Name = mongoDbUserRoot.User.Name,
+                Email = mongoDbUserRoot.User.Email,
+                Score = mongoDbUserRoot.User.Score,
+                AssignedGradeIds = mongoDbUserRoot.User.AssignedGradeIds
             };
         }
     }
