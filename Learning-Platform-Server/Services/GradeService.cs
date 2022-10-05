@@ -29,7 +29,7 @@ namespace Learning_Platform_Server.Services
             List<GradeResponse> gradeList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                return null;
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -56,7 +56,7 @@ namespace Learning_Platform_Server.Services
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                return null;
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
