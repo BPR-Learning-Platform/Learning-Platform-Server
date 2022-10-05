@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization;
 
 namespace Learning_Platform_Server.Services
 {
-    public class Util
+    public class MongoDbHelper
     {
         public static BsonArray MapToBsonArray(HttpResponseMessage httpResponseMessage)
         {

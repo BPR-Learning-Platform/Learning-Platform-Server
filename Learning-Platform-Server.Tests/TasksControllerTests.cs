@@ -18,7 +18,7 @@ namespace Learning_Platform_Server.Tests
 {
     public class TasksControllerTests
     {
-        private const string TasksUrl = "/Tasks?userid=";
+        private const string TasksUrl = "/tasks";
         private readonly ITestOutputHelper _output;
 
         public TasksControllerTests(ITestOutputHelper output)
@@ -27,17 +27,44 @@ namespace Learning_Platform_Server.Tests
         }
 
 
-        // GET ALL
+        // GET BATCH
 
         [Fact]
-        public async Task Get_all_receives_200_OK_with_multiple_objects_of_expected_type()
+        public async Task Get_batch_for_signed_in_user_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            string userId = "1";
+            JsonContent content = JsonContent.Create(new { email = "student3@student.com", password = "12345678" });
 
-            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + userId);
+            HttpResponseMessage? responseMsg = await client.PostAsync(UsersControllerTests.SignInUrl, content);
+            _output.WriteLine("Statuscode:" + responseMsg.StatusCode);
+            _output.WriteLine(content.ReadAsStringAsync().Result);
+
+            responseMsg.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            await BatchTest(client);
+        }
+
+        //[Fact] //TODO
+        public async Task Get_batch_for_NON_signed_in_user_receives_200_OK_with_multiple_objects_of_expected_type()
+        {
+            await using var application = new WebApplicationFactory<Program>();
+            using var client = application.CreateClient();
+
+            await BatchTest(client);
+        }
+
+        //TODO Test if the tasks are associated with the right step
+
+
+        // helper methods
+
+        private async Task BatchTest(HttpClient client)
+        {
+            string userId = "51";
+
+            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + 100);
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
             string? responseContentString = httpResponseMessage.Content.ReadAsStringAsync().Result;

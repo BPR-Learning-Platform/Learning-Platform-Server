@@ -17,7 +17,7 @@ namespace Learning_Platform_Server.Tests
 {
     public class UsersControllerTests
     {
-        private const string SignInUrl = "/users/signin";
+        public const string SignInUrl = "/users/signin";
         private readonly ITestOutputHelper _output;
 
         public UsersControllerTests(ITestOutputHelper output)
