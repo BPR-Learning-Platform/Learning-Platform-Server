@@ -93,7 +93,23 @@ namespace Learning_Platform_Server.Controllers
 
 
             List<TaskResponse>? taskResponseList = _taskService.GetAll((int)gradeResponse.Step);
-            return Ok(taskResponseList);
+
+            List<TaskResponse> taskResponseBatchList = new();
+
+            Random random = new();
+
+            if (taskResponseList is not null)
+            {
+                if (taskResponseList.Count == 0)
+                    throw new Exception("Unable to read any tasks from task collection for step number " + gradeResponse.Step + " in the database.");
+
+                for (int i = 0; i < 3; i++)
+                {
+                    taskResponseBatchList.Add(taskResponseList[random.Next(0, taskResponseList.Count())]);
+                }
+            }
+
+            return Ok(taskResponseBatchList);
         }
     }
 }

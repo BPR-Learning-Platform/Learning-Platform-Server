@@ -92,6 +92,10 @@ namespace Learning_Platform_Server.Tests
                     // Step
                     taskResponse.Step.Should().BeGreaterThan(0);
 
+                    // Type
+                    List<string> list = new() { "A", "S", "M", "D" };
+                    list.Should().Contain(taskResponse.Type);
+
                     // Difficulty
                     taskResponse.Difficulty.Should().BeGreaterThan(0);
 

@@ -27,17 +27,18 @@ namespace Learning_Platform_Server.Services
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+
+                new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
             foreach (BsonValue taskRootBsonValue in taskRootBsonArray)
             {
-                MongoDbTask? mongoDbTask = MapToMongoDbTask(taskRootBsonValue);
-                if (mongoDbTask is null)
+                MongoDbTaskRoot? mongoDbTaskRoot = MapToMongoDbTaskRoot(taskRootBsonValue);
+                if (mongoDbTaskRoot is null)
                     break;
 
-                TaskResponse? taskResponse = MapToTaskResponse(mongoDbTask);
+                TaskResponse? taskResponse = MapToTaskResponse(mongoDbTaskRoot);
 
                 // only return valid tasks
                 if (taskResponse is not null)
@@ -52,7 +53,7 @@ namespace Learning_Platform_Server.Services
 
         // helper methods 
 
-        private static MongoDbTask? MapToMongoDbTask(BsonValue taskRootBsonValue)
+        private static MongoDbTaskRoot? MapToMongoDbTaskRoot(BsonValue taskRootBsonValue)
         {
             string? taskRootJson = MongoDbHelper.MapToJson(taskRootBsonValue);
 
@@ -63,46 +64,63 @@ namespace Learning_Platform_Server.Services
             }
 
 
-            TaskRoot? taskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskRoot>(taskRootJson);
+            MongoDbTaskRoot? mongoDbTaskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbTaskRoot>(taskRootJson);
 
-            if (taskRoot is null)
+            if (mongoDbTaskRoot is null)
             {
                 Console.WriteLine("taskRoot is null.");
                 return null;
             }
 
-            if (taskRoot.Task is null)
+            if (mongoDbTaskRoot.Task is null)
             {
                 Console.WriteLine("taskRoot.Task is null.");
                 return null; ;
             }
 
 
-            return taskRoot.Task;
+            return mongoDbTaskRoot;
         }
 
-        private static TaskResponse? MapToTaskResponse(MongoDbTask mongoDbTask)
+        private static TaskResponse? MapToTaskResponse(MongoDbTaskRoot mongoDbTaskRoot)
         {
             // ignore MongoDbTask if one or more values are missing
-            if (String.IsNullOrEmpty(mongoDbTask.TaskID)
-                || String.IsNullOrEmpty(mongoDbTask.Step)
-                || String.IsNullOrEmpty(mongoDbTask.Difficulty)
-                || String.IsNullOrEmpty(mongoDbTask.Exercise)
-                || String.IsNullOrEmpty(mongoDbTask.Answer))
+            if (mongoDbTaskRoot is null
+                || mongoDbTaskRoot.Task is null
+                || mongoDbTaskRoot.TaskId is null
+                || mongoDbTaskRoot.TaskId.NumberLong is null
+                || String.IsNullOrEmpty(mongoDbTaskRoot.Task.Step)
+                || String.IsNullOrEmpty(mongoDbTaskRoot.Task.Type)
+                || String.IsNullOrEmpty(mongoDbTaskRoot.Task.Difficulty)
+                || String.IsNullOrEmpty(mongoDbTaskRoot.Task.Exercise)
+                || String.IsNullOrEmpty(mongoDbTaskRoot.Task.Answer))
             {
-                Console.WriteLine("One or more properties of mongoDbTask is null or empty, so mapping to TaskResponse is not completed. " +
-                    "Details: " + mongoDbTask);
+                Console.WriteLine("One or more properties of mongoDbTaskRoot is null or empty, so mapping to TaskResponse is not completed. " +
+                    "Details: " + mongoDbTaskRoot);
                 return null;
             }
             else
             {
+                if (mongoDbTaskRoot.Task is null)
+                {
+                    Console.WriteLine("Task was not found in mongoDbTaskRoot");
+                    return null;
+                }
+
+                if (mongoDbTaskRoot.TaskId is null)
+                {
+                    Console.WriteLine("TaskId was not found in mongoDbTaskRoot");
+                    return null;
+                }
+
                 return new TaskResponse()
                 {
-                    TaskId = mongoDbTask.TaskID,
-                    Step = int.Parse(mongoDbTask.Step),
-                    Difficulty = int.Parse(mongoDbTask.Difficulty),
-                    Exercise = mongoDbTask.Exercise,
-                    Answer = int.Parse(mongoDbTask.Answer)
+                    TaskId = mongoDbTaskRoot.TaskId.NumberLong,
+                    Step = int.Parse(mongoDbTaskRoot.Task.Step),
+                    Type = mongoDbTaskRoot.Task.Type,
+                    Difficulty = int.Parse(mongoDbTaskRoot.Task.Difficulty),
+                    Exercise = mongoDbTaskRoot.Task.Exercise,
+                    Answer = int.Parse(mongoDbTaskRoot.Task.Answer)
                 };
             }
         }
