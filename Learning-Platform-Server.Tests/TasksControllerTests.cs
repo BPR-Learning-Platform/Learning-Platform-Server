@@ -46,7 +46,7 @@ namespace Learning_Platform_Server.Tests
             await BatchTest(client);
         }
 
-        //[Fact] //TODO
+        [Fact]
         public async Task Get_batch_for_NON_signed_in_user_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             await using var application = new WebApplicationFactory<Program>();

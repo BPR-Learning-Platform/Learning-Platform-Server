@@ -72,14 +72,11 @@ namespace Learning_Platform_Server.Services
 
         public UserResponse? GetById(string id)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?userid=" + id);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
-            // TEMPORARY exception message //TODO
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ". " +
-                    "A 'NotFound' statuscode is expected from the database if endpoint /user?id=... does not exist (yet). " +
-                    "If you're trying to get tasks, you can probably solve this error by posting a signin request for the user (will only work until the cache expires though).");
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
