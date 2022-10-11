@@ -39,12 +39,10 @@ namespace Learning_Platform_Server.Controllers
 
 
 
+            List<GradeResponse>? gradeResponseList = _cacheHelper.GetGradeResponseListFromCache();
 
-            // TEMPORARY VERSION //TODO: add caching of grades
-
-            List<GradeResponse>? gradeResponseList = _gradeService.GetAll();
             if (gradeResponseList is null || gradeResponseList.Count == 0)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get grades from database");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get grades");
 
             int assignedGradeId = userResponse.AssignedGradeIds[0];
 

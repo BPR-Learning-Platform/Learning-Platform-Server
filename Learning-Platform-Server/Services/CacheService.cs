@@ -1,4 +1,5 @@
-﻿using Learning_Platform_Server.Models.Users;
+﻿using Learning_Platform_Server.Models.Grades;
+using Learning_Platform_Server.Models.Users;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Learning_Platform_Server.Services
@@ -9,11 +10,18 @@ namespace Learning_Platform_Server.Services
         void ResetCachedUserList(UserResponse userResponse);
         UserResponse? GetUserResponseFromCache(string userId);
         void EnsureCaching(UserResponse userResponse);
+        List<GradeResponse>? GetGradeResponseListFromCache();
     }
 
     public class CacheService : ICacheService
     {
+        private readonly IMemoryCache _cache;
+        private readonly IUserService _userService;
+        private readonly IGradeService _gradeService;
+        private readonly ILogger<CacheService> _logger;
+
         public const string UserListCacheKey = "userList";
+        public const string GradeListCacheKey = "gradeList";
 
         public readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromMinutes(60))
@@ -21,32 +29,36 @@ namespace Learning_Platform_Server.Services
                 .SetPriority(CacheItemPriority.Normal)
                 .SetSize(1024);
 
-        private readonly IUserService _userService;
-
-        private IMemoryCache _cache;
-        private ILogger<CacheService> _logger;
-
-        public CacheService(IUserService userService, IMemoryCache cache, ILogger<CacheService> logger)
+        public CacheService(IUserService userService, IGradeService gradeService, IMemoryCache cache, ILogger<CacheService> logger)
         {
             _userService = userService;
+            _gradeService = gradeService;
             _cache = cache;
             _logger = logger;
         }
+
+
+
+        // USERS
 
         public void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse)
         {
             Console.WriteLine("Adding user to cached userlist");
             users = users.Append(userResponse);
-            users = _cache.Set(UserListCacheKey, users, CacheEntryOptions);
-            users.ToList().ForEach(x => Console.WriteLine(x));
+            SetCachedUserList(users);
         }
 
         public void ResetCachedUserList(UserResponse userResponse)
         {
             Console.WriteLine("Resetting cached user list and adding user");
-            List<UserResponse> newUserList = new() { userResponse };
-            newUserList = _cache.Set(UserListCacheKey, newUserList, CacheEntryOptions);
-            newUserList.ToList().ForEach(x => Console.WriteLine(x));
+            List<UserResponse> userList = new() { userResponse };
+            SetCachedUserList(userList);
+        }
+
+        private void SetCachedUserList(IEnumerable<UserResponse> users)
+        {
+            users = _cache.Set(UserListCacheKey, users, CacheEntryOptions);
+            users.ToList().ForEach(x => Console.WriteLine(x));
         }
 
         public UserResponse? GetUserResponseFromCache(string userId)
@@ -65,11 +77,6 @@ namespace Learning_Platform_Server.Services
                     userResponse = _userService.GetById(userId);
                     if (userResponse is null)
                         return null;
-
-                    Console.WriteLine("Requested user from database, since no cache entry was found for userid " + userId + ". " +
-                        "This could be due to expiration of the cache entry, " +
-                        "or it could be caused by a user requesting the tasks of another user (that has not been cached). " +
-                        "The tasks where requested for userid " + userId + " " + "which is associated with the user: " + userResponse + ". ");
 
                     AddToCachedUserList(users, userResponse);
                 }
@@ -107,6 +114,40 @@ namespace Learning_Platform_Server.Services
                 _logger.Log(LogLevel.Information, "User list not found in cache.");
                 ResetCachedUserList(userResponse);
             }
+        }
+
+
+
+        // GRADES
+
+        public List<GradeResponse>? GetGradeResponseListFromCache()
+        {
+            List<GradeResponse>? gradeResponseList;
+
+            if (_cache.TryGetValue(GradeListCacheKey, out IEnumerable<GradeResponse> grades))
+            {
+                _logger.Log(LogLevel.Information, "Grade list found in cache.");
+                gradeResponseList = grades.ToList();
+            }
+            else
+            {
+                _logger.Log(LogLevel.Information, "Grade list not found in cache.");
+
+                gradeResponseList = _gradeService.GetAll();
+                if (gradeResponseList is null)
+                    return null;
+
+                ResetCachedGradeList(gradeResponseList);
+            }
+
+            return gradeResponseList;
+        }
+
+        private void ResetCachedGradeList(List<GradeResponse> gradeResponseList)
+        {
+            Console.WriteLine("Resetting cached grade list");
+            List<GradeResponse>? newGradeResponseList = _cache.Set(GradeListCacheKey, gradeResponseList, CacheEntryOptions);
+            newGradeResponseList.ForEach(x => Console.WriteLine(x));
         }
     }
 }
