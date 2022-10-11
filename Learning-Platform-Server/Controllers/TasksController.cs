@@ -1,4 +1,5 @@
-﻿using Learning_Platform_Server.Models.Grades;
+﻿using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
@@ -30,32 +31,21 @@ namespace Learning_Platform_Server.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct)
         {
-            UserResponse? userResponse = _cacheHelper.GetUserResponseFromCache(userid);
-            if (userResponse is null)
-                return StatusCode(StatusCodes.Status404NotFound, "No user was found with userid " + userid);
+            UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
 
             if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No assignedgradeids were found for user with userid " + userid);
+                throw new Exception("No assignedgradeids were found for user with userid " + userid);
 
-
-
-            List<GradeResponse>? gradeResponseList = _cacheHelper.GetGradeResponseListFromCache();
-
-            if (gradeResponseList is null || gradeResponseList.Count == 0)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get grades");
+            List<GradeResponse> gradeResponseList = _cacheHelper.GetGradeResponseListFromCache();
 
             int assignedGradeId = userResponse.AssignedGradeIds[0];
 
             GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
             if (gradeResponse is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No grade was found for gradeid " + assignedGradeId);
+                throw new Exception("No grade was found for gradeid " + assignedGradeId);
 
             if (gradeResponse.Step is null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "No step was found for grade with gradeid " + assignedGradeId);
-
-
-
-
+                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
 
             List<TaskResponse>? taskResponseList = _taskService.GetAll((int)gradeResponse.Step);
 

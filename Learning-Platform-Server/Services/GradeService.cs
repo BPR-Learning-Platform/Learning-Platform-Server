@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.Entities;
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
@@ -88,7 +89,7 @@ namespace Learning_Platform_Server.Services
 
             if (gradeRootJson is null)
             {
-                Console.WriteLine("gradeRootJson is null.");
+                Console.WriteLine("gradeRootJson is null, so mapping to GradeRoot is not completed. ");
                 return null;
             }
 

@@ -1,4 +1,5 @@
-﻿using Learning_Platform_Server.Models.Users;
+﻿using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,14 +27,7 @@ namespace Learning_Platform_Server.Controllers
         [HttpPost("signin")]
         public ContentResult SignIn([FromBody] SignInRequest signInRequest)
         {
-            KeyValuePair<ContentResult, UserResponse?> keyValuePair = _userService.SignInUser(signInRequest);
-
-            UserResponse? userResponse = keyValuePair.Value;
-            if (userResponse is null)
-            {
-                ContentResult? contentResult = keyValuePair.Key;
-                return contentResult;
-            }
+            UserResponse userResponse = _userService.SignInUser(signInRequest);
 
             _cacheHelper.EnsureCaching(userResponse);
 

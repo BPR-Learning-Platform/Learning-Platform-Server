@@ -1,3 +1,4 @@
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +8,10 @@ const string allowSpecificOrigins = "_allowRequestsFromBPR-Learning-Platform-Fro
 
 var services = builder.Services;
 
-services.AddControllers();
+services.AddControllers(options =>
+{
+    options.Filters.Add<UnhandledExceptionFilterAttribute>();
+});
 services.AddMemoryCache();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -18,7 +22,7 @@ services.AddSwaggerGen();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IGradeService, GradeService>();
-services.AddScoped<ICacheService, CacheService>();
+services.AddScoped<ICacheService, CacheHandler>();
 
 services.AddCors(options =>
 {

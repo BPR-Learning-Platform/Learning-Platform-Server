@@ -1,24 +1,25 @@
 ﻿using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Users;
+using Learning_Platform_Server.Services;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Learning_Platform_Server.Services
+namespace Learning_Platform_Server.Helpers
 {
     public interface ICacheService
     {
         void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse);
         void ResetCachedUserList(UserResponse userResponse);
-        UserResponse? GetUserResponseFromCache(string userId);
+        UserResponse GetUserResponseFromCache(string userId);
         void EnsureCaching(UserResponse userResponse);
-        List<GradeResponse>? GetGradeResponseListFromCache();
+        List<GradeResponse> GetGradeResponseListFromCache();
     }
 
-    public class CacheService : ICacheService
+    public class CacheHandler : ICacheService
     {
         private readonly IMemoryCache _cache;
         private readonly IUserService _userService;
         private readonly IGradeService _gradeService;
-        private readonly ILogger<CacheService> _logger;
+        private readonly ILogger<CacheHandler> _logger;
 
         public const string UserListCacheKey = "userList";
         public const string GradeListCacheKey = "gradeList";
@@ -29,7 +30,7 @@ namespace Learning_Platform_Server.Services
                 .SetPriority(CacheItemPriority.Normal)
                 .SetSize(1024);
 
-        public CacheService(IUserService userService, IGradeService gradeService, IMemoryCache cache, ILogger<CacheService> logger)
+        public CacheHandler(IUserService userService, IGradeService gradeService, IMemoryCache cache, ILogger<CacheHandler> logger)
         {
             _userService = userService;
             _gradeService = gradeService;
@@ -61,7 +62,7 @@ namespace Learning_Platform_Server.Services
             users.ToList().ForEach(x => Console.WriteLine(x));
         }
 
-        public UserResponse? GetUserResponseFromCache(string userId)
+        public UserResponse GetUserResponseFromCache(string userId)
         {
             UserResponse? userResponse;
 
@@ -76,7 +77,7 @@ namespace Learning_Platform_Server.Services
 
                     userResponse = _userService.GetById(userId);
                     if (userResponse is null)
-                        return null;
+                        throw new KeyNotFoundException("Could not find user with id " + userId);
 
                     AddToCachedUserList(users, userResponse);
                 }
@@ -87,7 +88,7 @@ namespace Learning_Platform_Server.Services
 
                 userResponse = _userService.GetById(userId);
                 if (userResponse is null)
-                    return null;
+                    throw new KeyNotFoundException("Could not find user with id " + userId);
 
                 ResetCachedUserList(userResponse);
             }
@@ -120,7 +121,7 @@ namespace Learning_Platform_Server.Services
 
         // GRADES
 
-        public List<GradeResponse>? GetGradeResponseListFromCache()
+        public List<GradeResponse> GetGradeResponseListFromCache()
         {
             List<GradeResponse>? gradeResponseList;
 
@@ -135,7 +136,7 @@ namespace Learning_Platform_Server.Services
 
                 gradeResponseList = _gradeService.GetAll();
                 if (gradeResponseList is null)
-                    return null;
+                    throw new Exception("Could not find grade list");
 
                 ResetCachedGradeList(gradeResponseList);
             }
