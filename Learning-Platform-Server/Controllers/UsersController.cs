@@ -33,6 +33,5 @@ namespace Learning_Platform_Server.Controllers
 
             return new ContentResult() { StatusCode = StatusCodes.Status200OK, Content = userResponse.ToJson() };
         }
-
     }
 }

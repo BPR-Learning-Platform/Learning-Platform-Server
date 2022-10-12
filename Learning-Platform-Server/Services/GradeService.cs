@@ -15,12 +15,20 @@ namespace Learning_Platform_Server.Services
     public interface IGradeService
     {
         List<GradeResponse>? GetAll();
+        List<GradeResponseToTeacher>? GetAllToTeacher(string teacherId);
         GradeResponse? GetById(int id);
     }
 
     public class GradeService : IGradeService
     {
+
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/grade";
+        private readonly IUserService _userService;
+
+        public GradeService(IUserService userService)
+        {
+            _userService = userService;
+        }
 
         public List<GradeResponse>? GetAll()
         {
@@ -49,6 +57,34 @@ namespace Learning_Platform_Server.Services
             }
 
             return gradeList;
+        }
+
+        public List<GradeResponseToTeacher>? GetAllToTeacher(string teacherId)
+        {
+            UserResponse? teacher = _userService.GetById(teacherId);
+
+            List<GradeResponseToTeacher> gradeResponsesToTeacher = new();
+
+            List<GradeResponse> gradeResponses = GetAll(); //TODO Use caching instead ?
+
+            foreach (int gradeId in teacher.AssignedGradeIds)
+            {
+                string gradeName = gradeResponses.FirstOrDefault(x => x.GradeId.Equals(gradeId + "")).Name;
+
+
+                List<UserResponse> userResponseList = _userService.GetByGradeId(gradeId);
+                List<UserResponseToTeacher> studentsToTeacher = new();
+                foreach (UserResponse? user in userResponseList)
+                {
+                    if (user.Type.Equals("S"))
+                        studentsToTeacher.Add(new UserResponseToTeacher() { UserId = user.UserId, Name = user.Name });
+                }
+
+
+                gradeResponsesToTeacher.Add(new GradeResponseToTeacher() { GradeId = gradeId + "", GradeName = gradeName, Students = studentsToTeacher });
+            }
+
+            return gradeResponsesToTeacher;
         }
 
         public GradeResponse? GetById(int id)

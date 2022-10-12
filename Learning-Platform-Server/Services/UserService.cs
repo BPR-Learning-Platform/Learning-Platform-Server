@@ -14,6 +14,7 @@ namespace Learning_Platform_Server.Services
     {
         UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
+        List<UserResponse> GetByGradeId(int gradeId);
     }
 
     public class UserService : IUserService
@@ -69,6 +70,35 @@ namespace Learning_Platform_Server.Services
                 return userResponse;
             }
             return null;
+        }
+
+        public List<UserResponse> GetByGradeId(int gradeId)
+        {
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/wholegrade" + "?assignedgradeid=" + gradeId);
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+
+            List<UserResponse> userList = new();
+
+            BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
+
+            foreach (BsonValue userRootBsonValue in userRootBsonArray)
+            {
+                MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
+                if (mongoDbUserRoot is null)
+                    break;
+
+                UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
+
+                // only return valid tasks
+                if (userResponse is not null)
+                    userList.Add(userResponse);
+
+            }
+
+            return userList;
         }
 
 
