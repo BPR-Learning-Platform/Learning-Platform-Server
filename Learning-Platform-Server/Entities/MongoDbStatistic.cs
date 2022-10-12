@@ -8,9 +8,8 @@ namespace Learning_Platform_Server.Entities
         [JsonProperty("_id")]
         public Id? Id { get; set; }
         public MongoDbStatistic? Statistic { get; set; }
-        public StatisticId? StatisticId { get; set; }
         public TimeStamp? TimeStamp { get; set; }
-        public override string ToString() => "MongoDbStatisticRoot: Oid: " + Id + ", " + Statistic + ", StatisticId: " + StatisticId;
+        public override string ToString() => "MongoDbStatisticRoot: Oid: " + Id + ", " + Statistic;
     }
     public class StatisticId
     {
