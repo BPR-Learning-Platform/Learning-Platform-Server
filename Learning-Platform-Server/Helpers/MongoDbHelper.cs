@@ -2,7 +2,7 @@
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 
-namespace Learning_Platform_Server.Services
+namespace Learning_Platform_Server.Helpers
 {
     public class MongoDbHelper
     {

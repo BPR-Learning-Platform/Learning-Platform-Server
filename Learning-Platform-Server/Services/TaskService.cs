@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.Entities;
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,6 @@ namespace Learning_Platform_Server.Services
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-
                 new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
@@ -59,7 +59,7 @@ namespace Learning_Platform_Server.Services
 
             if (taskRootJson is null)
             {
-                Console.WriteLine("taskRootJson is null.");
+                Console.WriteLine("taskRootJson is null, so mapping is not completed. ");
                 return null;
             }
 
@@ -68,14 +68,14 @@ namespace Learning_Platform_Server.Services
 
             if (mongoDbTaskRoot is null)
             {
-                Console.WriteLine("taskRoot is null.");
+                Console.WriteLine("taskRoot is null, so mapping is not completed. ");
                 return null;
             }
 
             if (mongoDbTaskRoot.Task is null)
             {
-                Console.WriteLine("taskRoot.Task is null.");
-                return null; ;
+                Console.WriteLine("taskRoot.Task is null, so mapping is not completed. ");
+                return null;
             }
 
 
@@ -101,18 +101,6 @@ namespace Learning_Platform_Server.Services
             }
             else
             {
-                if (mongoDbTaskRoot.Task is null)
-                {
-                    Console.WriteLine("Task was not found in mongoDbTaskRoot");
-                    return null;
-                }
-
-                if (mongoDbTaskRoot.TaskId is null)
-                {
-                    Console.WriteLine("TaskId was not found in mongoDbTaskRoot");
-                    return null;
-                }
-
                 return new TaskResponse()
                 {
                     TaskId = mongoDbTaskRoot.TaskId.NumberLong,

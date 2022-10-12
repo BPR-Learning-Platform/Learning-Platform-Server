@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.Entities;
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -11,7 +12,7 @@ namespace Learning_Platform_Server.Services
 {
     public interface IUserService
     {
-        KeyValuePair<ContentResult, UserResponse?> SignInUser(SignInRequest signInRequest);
+        UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
     }
 
@@ -20,7 +21,7 @@ namespace Learning_Platform_Server.Services
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
         // SIGN IN
-        public KeyValuePair<ContentResult, UserResponse?> SignInUser(SignInRequest signInRequest)
+        public UserResponse SignInUser(SignInRequest signInRequest)
         {
             HttpRequestMessage request = new(new HttpMethod("POST"), Url + "/signin")
             {
@@ -30,42 +31,17 @@ namespace Learning_Platform_Server.Services
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
             BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
             if (userRootBsonArray.Count == 0)
-            {
-                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "No user was found with the given credentials"
-                }, null);
-            }
+                throw new UnauthorizedAccessException("No user was found with the given credentials");
 
             BsonValue userRootBsonValue = userRootBsonArray[0];
 
             MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
             if (mongoDbUserRoot is null)
-            {
-                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Content = "Could not read user information from BsonValue"
-                }, null);
-            }
+                throw new Exception("Could not read user information from BsonValue");
 
-            if (mongoDbUserRoot is null)
-            {
-                return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Content = "Could not read mongoDbUserRoot from userRootJson"
-                }, null);
-            }
+            UserResponse userResponse = MapToUserResponse(mongoDbUserRoot);
 
-            UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
-
-            return new KeyValuePair<ContentResult, UserResponse?>(new ContentResult()
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Content = ""
-            }, userResponse);
+            return userResponse;
         }
 
         // GET BY ID
@@ -86,12 +62,9 @@ namespace Learning_Platform_Server.Services
 
                 MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
                 if (mongoDbUserRoot is null)
-                {
-                    Console.WriteLine("UserRoot was not found");
-                    return null;
-                }
+                    throw new Exception("Could not read user information from BsonValue");
 
-                UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
+                UserResponse userResponse = MapToUserResponse(mongoDbUserRoot);
 
                 return userResponse;
             }
@@ -107,7 +80,7 @@ namespace Learning_Platform_Server.Services
 
             if (userRootJson is null)
             {
-                Console.WriteLine("userRootJson is null");
+                Console.WriteLine("userRootJson is null, so mapping to UserRoot is not completed. ");
                 return null;
             }
 
@@ -118,19 +91,13 @@ namespace Learning_Platform_Server.Services
             return mongoDbUserRoot;
         }
 
-        private static UserResponse? MapToUserResponse(MongoDbUserRoot mongoDbUserRoot)
+        private static UserResponse MapToUserResponse(MongoDbUserRoot mongoDbUserRoot)
         {
             if (mongoDbUserRoot.User is null)
-            {
-                Console.WriteLine("User was not found in mongoDbUserRoot");
-                return null;
-            }
+                throw new NullReferenceException("User was not found in mongoDbUserRoot");
 
             if (mongoDbUserRoot.UserId is null)
-            {
-                Console.WriteLine("UserId was not found in mongoDbUserRoot");
-                return null;
-            }
+                throw new NullReferenceException("UserId was not found in mongoDbUserRoot");
 
             return new UserResponse()
             {
