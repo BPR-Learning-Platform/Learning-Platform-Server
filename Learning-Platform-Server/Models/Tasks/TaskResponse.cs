@@ -13,7 +13,7 @@ namespace Learning_Platform_Server.Models.Tasks
 
         public override string ToString()
         {
-            return "MongoDbTask: taskid: " + TaskId +
+            return "TaskResponse: taskid: " + TaskId +
                 ", step: " + Step +
                 ", type: " + Type +
                 ", difficulty: " + Difficulty +

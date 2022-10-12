@@ -10,7 +10,7 @@ namespace Learning_Platform_Server.Models.Grades
 
         public override string ToString()
         {
-            return "MongoDbGrade: gradeid: " + GradeId +
+            return "GradeResponse: gradeid: " + GradeId +
                 ", step: " + Step +
                 ", name: " + Name;
         }

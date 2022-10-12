@@ -28,7 +28,7 @@ namespace Learning_Platform_Server.Services
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
