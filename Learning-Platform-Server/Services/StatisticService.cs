@@ -23,10 +23,6 @@ namespace Learning_Platform_Server.Services
 
         public List<StatisticResponse> GetAll(int studentId)
         {
-            // TEMPORARY VERSION 
-            List<StatisticResponse> statisticList = GetDummyData(studentId);
-            /*
-
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?studentid=" + studentId);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
@@ -50,7 +46,6 @@ namespace Learning_Platform_Server.Services
                     statisticList.Add(statisticResponse);
 
             }
-            */
 
             return statisticList;
         }
@@ -84,53 +79,29 @@ namespace Learning_Platform_Server.Services
                 return null;
             }
 
+            if (mongoDbStatisticRoot.TimeStamp is null)
+            {
+                Console.WriteLine("TimeStamp was not found in mongoDbStatisticRoot");
+                return null;
+            }
+
+            if (mongoDbStatisticRoot.TimeStamp.DateTime is null)
+            {
+                Console.WriteLine("DateTime was not found in TimeStamp");
+                return null;
+            }
+
+
+            var date = mongoDbStatisticRoot.TimeStamp.DateTime.NumberLong;
+
             return new StatisticResponse()
             {
                 StatisticId = mongoDbStatisticRoot.StatisticId.NumberLong,
                 StudentId = mongoDbStatisticRoot.Statistic.StudentId,
                 GradeId = mongoDbStatisticRoot.Statistic.GradeId,
                 Score = mongoDbStatisticRoot.Statistic.Score,
-                TimeStamp = mongoDbStatisticRoot.Statistic.TimeStamp
+                TimeStamp = MongoDbHelper.MapToDateTime(date)
             };
-        }
-
-        private List<StatisticResponse> GetDummyData(int studentId)
-        {
-            List<StatisticResponse> statisticList = new List<StatisticResponse>();
-            statisticList.Add(new StatisticResponse()
-            {
-                StatisticId = "1",
-                StudentId = studentId + "",
-                GradeId = 1 + "",
-                Score = 9,
-                TimeStamp = DateTime.Now
-            });
-
-            statisticList.Add(new StatisticResponse()
-            {
-                StatisticId = "2",
-                StudentId = studentId + "",
-                GradeId = 1 + "",
-                Score = 7,
-                TimeStamp = DateTime.Now.AddDays(-7)
-            });
-            statisticList.Add(new StatisticResponse()
-            {
-                StatisticId = "3",
-                StudentId = studentId + "",
-                GradeId = 1 + "",
-                Score = 6,
-                TimeStamp = DateTime.Now.AddDays(-14)
-            });
-            statisticList.Add(new StatisticResponse()
-            {
-                StatisticId = "4",
-                StudentId = studentId + "",
-                GradeId = 1 + "",
-                Score = 2,
-                TimeStamp = DateTime.Now.AddDays(-21)
-            });
-            return statisticList;
         }
     }
 }
