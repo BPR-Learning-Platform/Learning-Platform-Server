@@ -22,6 +22,7 @@ services.AddSwaggerGen();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IGradeService, GradeService>();
+services.AddScoped<IStatisticService, StatisticService>();
 services.AddScoped<ICacheService, CacheHandler>();
 
 services.AddCors(options =>

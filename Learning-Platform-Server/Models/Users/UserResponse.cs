@@ -13,7 +13,7 @@ namespace Learning_Platform_Server.Models.Users
 
         public override string ToString()
         {
-            return "UserModel: userid: " + UserId +
+            return "UserResponse: userid: " + UserId +
                 ", type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
