@@ -4,7 +4,6 @@ namespace Learning_Platform_Server.Models.Grades
 {
     public class StatisticResponse
     {
-        public string? StatisticId { get; set; }
         public string? StudentId { get; set; }
         public string? GradeId { get; set; }
         public int? Score { get; set; }
@@ -12,8 +11,7 @@ namespace Learning_Platform_Server.Models.Grades
 
         public override string ToString()
         {
-            return "StatisticResponse: statistic id: " + StatisticId +
-                ", student id: " + StudentId +
+            return "StatisticResponse: student id: " + StudentId +
                 ", score: " + Score +
                 ", timestamp: " + TimeStamp;
         }

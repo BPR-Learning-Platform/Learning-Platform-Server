@@ -73,12 +73,6 @@ namespace Learning_Platform_Server.Services
                 return null;
             }
 
-            if (mongoDbStatisticRoot.StatisticId is null)
-            {
-                Console.WriteLine("StatisticId was not found in mongoDbStatisticRoot");
-                return null;
-            }
-
             if (mongoDbStatisticRoot.TimeStamp is null)
             {
                 Console.WriteLine("TimeStamp was not found in mongoDbStatisticRoot");
@@ -96,7 +90,6 @@ namespace Learning_Platform_Server.Services
 
             return new StatisticResponse()
             {
-                StatisticId = mongoDbStatisticRoot.StatisticId.NumberLong,
                 StudentId = mongoDbStatisticRoot.Statistic.StudentId,
                 GradeId = mongoDbStatisticRoot.Statistic.GradeId,
                 Score = mongoDbStatisticRoot.Statistic.Score,
