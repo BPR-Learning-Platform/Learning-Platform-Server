@@ -30,7 +30,7 @@ namespace Learning_Platform_Server.Services
             _userService = userService;
         }
 
-        public List<GradeResponse>? GetAll()
+        public List<GradeResponse> GetAll()
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
@@ -50,7 +50,7 @@ namespace Learning_Platform_Server.Services
 
                 GradeResponse? gradeResponse = MapToGradeResponse(mongoDbGradeRoot);
 
-                // only return valid tasks
+                // only return valid grades
                 if (gradeResponse is not null)
                     gradeList.Add(gradeResponse);
 
@@ -63,19 +63,35 @@ namespace Learning_Platform_Server.Services
         {
             UserResponse? teacher = _userService.GetById(teacherId);
 
-            List<GradeResponseToTeacher> gradeResponsesToTeacher = new();
+            if (teacher is null)
+                throw new KeyNotFoundException("Could not find teacher with id " + teacherId);
+
+            if (teacher.AssignedGradeIds is null)
+                throw new NullReferenceException("No assigned grade ids were found for the teacher: " + teacher);
 
             List<GradeResponse> gradeResponses = GetAll(); //TODO Use caching instead ?
 
+            List<GradeResponseToTeacher> gradeResponsesToTeacher = new();
+
             foreach (int gradeId in teacher.AssignedGradeIds)
             {
-                string gradeName = gradeResponses.FirstOrDefault(x => x.GradeId.Equals(gradeId + "")).Name;
+                GradeResponse? gradeResponse = gradeResponses.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(gradeId + ""));
 
+                if (gradeResponse is null)
+                    throw new KeyNotFoundException("Could not find grade with grade id " + gradeId);
+
+                string? gradeName = gradeResponse.Name;
 
                 List<UserResponse> userResponseList = _userService.GetByGradeId(gradeId);
                 List<UserResponseToTeacher> studentsToTeacher = new();
                 foreach (UserResponse? user in userResponseList)
                 {
+                    if (user.Type is null)
+                    {
+                        Console.WriteLine("Could not read type from user: " + user + ", so the user is not included.");
+                        break;
+                    }
+
                     if (user.Type.Equals("S"))
                         studentsToTeacher.Add(new UserResponseToTeacher() { UserId = user.UserId, Name = user.Name });
                 }

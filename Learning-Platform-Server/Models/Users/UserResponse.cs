@@ -17,8 +17,20 @@ namespace Learning_Platform_Server.Models.Users
                 ", type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
-                ", score: " + Score;
-            //"\t, assignedGradeIds: " + AssignedGradeIds;
+                ", score: " + Score +
+                ", assignedGradeIds: " + (AssignedGradeIds is not null ? string.Join(",", AssignedGradeIds) : "");
+        }
+    }
+
+    public class UserResponseToTeacher
+    {
+        public string? UserId { get; set; }
+        public string? Name { get; set; }
+
+        public override string ToString()
+        {
+            return "UserResponse: userid: " + UserId +
+                ", name: " + Name;
         }
     }
 }
