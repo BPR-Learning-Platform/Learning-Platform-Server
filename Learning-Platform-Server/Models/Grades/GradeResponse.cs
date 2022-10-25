@@ -7,13 +7,13 @@ namespace Learning_Platform_Server.Models.Grades
     {
         public string? GradeId { get; set; }
         public int? Step { get; set; }
-        public string? Name { get; set; }
+        public string? GradeName { get; set; }
 
         public override string ToString()
         {
             return "GradeResponse: gradeid: " + GradeId +
                 ", step: " + Step +
-                ", name: " + Name;
+                ", name: " + GradeName;
         }
     }
 
@@ -25,7 +25,9 @@ namespace Learning_Platform_Server.Models.Grades
 
         public override string ToString()
         {
-            return "GradeResponse: gradeid: " + GradeId;
+            return "GradeResponse: gradeid: " + GradeId +
+                ", name: " + GradeName +
+                ", students: " + (Students is not null ? string.Join(",", Students) : "");
         }
     }
 }

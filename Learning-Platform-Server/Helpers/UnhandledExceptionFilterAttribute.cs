@@ -23,6 +23,8 @@ namespace Learning_Platform_Server.Helpers
                 statusCode = 401;
             else if (context.Exception is KeyNotFoundException)
                 statusCode = 404;
+            else if (context.Exception is BadHttpRequestException)
+                statusCode = 400;
 
             var result = new ObjectResult(new
             {

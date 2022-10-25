@@ -66,6 +66,12 @@ namespace Learning_Platform_Server.Services
             if (teacher is null)
                 throw new KeyNotFoundException("Could not find teacher with id " + teacherId);
 
+            if (teacher.Type is null)
+                throw new NullReferenceException("No type was found for user with id " + teacherId + ", so could not determine if the user is really a teacher. Details: " + teacher);
+
+            if (!teacher.Type.Equals("T"))
+                throw new BadHttpRequestException("The user with id " + teacherId + " has a type that does not represent a teacher. Details: " + teacher);
+
             if (teacher.AssignedGradeIds is null)
                 throw new NullReferenceException("No assigned grade ids were found for the teacher: " + teacher);
 
@@ -80,7 +86,7 @@ namespace Learning_Platform_Server.Services
                 if (gradeResponse is null)
                     throw new KeyNotFoundException("Could not find grade with grade id " + gradeId);
 
-                string? gradeName = gradeResponse.Name;
+                string? gradeName = gradeResponse.GradeName;
 
                 List<UserResponse> userResponseList = _userService.GetByGradeId(gradeId);
                 List<UserResponseToTeacher> studentsToTeacher = new();
@@ -168,7 +174,7 @@ namespace Learning_Platform_Server.Services
             {
                 GradeId = mongoDbGradeRoot.GradeId.NumberLong,
                 Step = mongoDbGradeRoot.Grade.Step is not null ? int.Parse(mongoDbGradeRoot.Grade.Step) : -1,
-                Name = mongoDbGradeRoot.Grade.GradeName
+                GradeName = mongoDbGradeRoot.Grade.GradeName
             };
         }
 
