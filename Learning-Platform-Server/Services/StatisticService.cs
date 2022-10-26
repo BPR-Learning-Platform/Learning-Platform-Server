@@ -14,16 +14,34 @@ namespace Learning_Platform_Server.Services
 {
     public interface IStatisticService
     {
-        List<StatisticResponse> GetAll(int studentId);
+        List<StatisticResponse> GetAllByStudentId(int studentId);
+        List<StatisticResponse> GetAllByGradeId(int gradetId);
     }
 
     public class StatisticService : IStatisticService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/statistic";
 
-        public List<StatisticResponse> GetAll(int studentId)
+        public List<StatisticResponse> GetAllByStudentId(int studentId)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?studentid=" + studentId);
+            return GetAllByParameter(studentId, null);
+        }
+
+        public List<StatisticResponse> GetAllByGradeId(int gradeId)
+        {
+            return GetAllByParameter(null, gradeId);
+        }
+
+        private List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId)
+        {
+            string parameterString = "";
+
+            if (studentId.HasValue)
+                parameterString = "?studentid=" + studentId;
+            else if (gradeId.HasValue)
+                parameterString = "?gradeid=" + gradeId;
+
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + parameterString);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
 
             List<StatisticResponse> statisticList = new();

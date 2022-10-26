@@ -23,9 +23,14 @@ namespace Learning_Platform_Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<StatisticResponse>> GetAll([FromQuery] string studentid)
+        public ActionResult<IEnumerable<StatisticResponse>> GetAll([FromQuery] string? studentid, string? gradeId)
         {
-            List<StatisticResponse> statisticResponseList = _statisticService.GetAll(int.Parse(studentid));
+            List<StatisticResponse> statisticResponseList = new();
+            if (studentid is not null)
+                statisticResponseList = _statisticService.GetAllByStudentId(int.Parse(studentid));
+            else if (gradeId is not null)
+                statisticResponseList = _statisticService.GetAllByGradeId(int.Parse(gradeId));
+
             return Ok(statisticResponseList);
         }
     }
