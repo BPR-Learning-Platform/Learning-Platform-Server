@@ -39,8 +39,8 @@ namespace Learning_Platform_Server.Entities
             return "MongoDBUser: type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
-                ", score: " + Score;
-            //", assignedGradeIds: " + AssignedGradeIds;
+                ", score: " + Score +
+                ", assignedGradeIds: " + (AssignedGradeIds is not null ? string.Join(",", AssignedGradeIds) : "");
 
         }
     }

@@ -41,7 +41,7 @@ namespace Learning_Platform_Server.Services
 
                 StatisticResponse? statisticResponse = MapToStatisticResponse(mongoDbStatisticRoot);
 
-                // only return valid tasks
+                // only return valid statistics
                 if (statisticResponse is not null)
                     statisticList.Add(statisticResponse);
 

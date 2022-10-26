@@ -21,7 +21,6 @@ namespace Learning_Platform_Server.Services
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
 
-        // SIGN IN
         public UserResponse SignInUser(SignInRequest signInRequest)
         {
             HttpRequestMessage request = new(new HttpMethod("POST"), Url + "/signin")
@@ -44,8 +43,6 @@ namespace Learning_Platform_Server.Services
 
             return userResponse;
         }
-
-        // GET BY ID
 
         public UserResponse? GetById(string id)
         {
@@ -92,7 +89,7 @@ namespace Learning_Platform_Server.Services
 
                 UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
 
-                // only return valid tasks
+                // only return valid users
                 if (userResponse is not null)
                     userList.Add(userResponse);
 
