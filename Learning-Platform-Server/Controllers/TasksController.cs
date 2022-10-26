@@ -15,11 +15,11 @@ namespace Learning_Platform_Server.Controllers
     {
         private readonly ITaskService _taskService;
         private readonly IGradeService _gradeService;
-        private readonly ICacheService _cacheHelper;
+        private readonly ICacheHandler _cacheHelper;
 
         private ILogger<TasksController> _logger;
 
-        public TasksController(ITaskService taskService, IGradeService gradeService, ICacheService cacheHelper, ILogger<TasksController> logger)
+        public TasksController(ITaskService taskService, IGradeService gradeService, ICacheHandler cacheHelper, ILogger<TasksController> logger)
         {
             _taskService = taskService;
             _gradeService = gradeService;

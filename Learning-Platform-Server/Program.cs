@@ -23,7 +23,7 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IGradeService, GradeService>();
 services.AddScoped<IStatisticService, StatisticService>();
-services.AddScoped<ICacheService, CacheHandler>();
+services.AddScoped<ICacheHandler, CacheHandler>();
 
 services.AddCors(options =>
 {

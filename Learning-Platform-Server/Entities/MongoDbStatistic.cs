@@ -36,7 +36,7 @@ namespace Learning_Platform_Server.Entities
     {
         public string? StudentId { get; set; }
         public string? GradeId { get; set; }
-        public int? Score { get; set; }
+        public float? Score { get; set; }
 
         public override string ToString()
         {

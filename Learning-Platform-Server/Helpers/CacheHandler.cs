@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Learning_Platform_Server.Helpers
 {
-    public interface ICacheService
+    public interface ICacheHandler
     {
         void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse);
         void ResetCachedUserList(UserResponse userResponse);
@@ -14,7 +14,7 @@ namespace Learning_Platform_Server.Helpers
         List<GradeResponse> GetGradeResponseListFromCache();
     }
 
-    public class CacheHandler : ICacheService
+    public class CacheHandler : ICacheHandler
     {
         private readonly IMemoryCache _cache;
         private readonly IUserService _userService;
