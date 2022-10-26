@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.Models.Users
         public string? Type { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public int? Score { get; set; }
+        public float? Score { get; set; }
         public List<int>? AssignedGradeIds { get; set; }
 
         public override string ToString()

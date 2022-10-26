@@ -12,11 +12,11 @@ namespace Learning_Platform_Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ICacheService _cacheHelper;
+        private readonly ICacheHandler _cacheHelper;
 
         private ILogger<UsersController> _logger;
 
-        public UsersController(IUserService userService, ICacheService cacheHelper, ILogger<UsersController> logger)
+        public UsersController(IUserService userService, ICacheHandler cacheHelper, ILogger<UsersController> logger)
         {
             _userService = userService;
             _cacheHelper = cacheHelper;
