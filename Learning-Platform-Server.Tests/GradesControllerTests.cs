@@ -31,7 +31,7 @@ namespace Learning_Platform_Server.Tests
 
         public GradesControllerTests(ITestOutputHelper output)
         {
-            this._output = output;
+            _output = output;
         }
 
         [Fact]

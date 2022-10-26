@@ -22,7 +22,7 @@ namespace Learning_Platform_Server.Tests
 
         public UsersControllerTests(ITestOutputHelper output)
         {
-            this._output = output;
+            _output = output;
         }
 
 

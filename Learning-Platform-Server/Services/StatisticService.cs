@@ -1,6 +1,6 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
-using Learning_Platform_Server.Models.Grades;
+using Learning_Platform_Server.Models.Statistics;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +29,27 @@ namespace Learning_Platform_Server.Services
 
         public List<StatisticResponse> GetAllByGradeId(int gradeId)
         {
-            return GetAllByParameter(null, gradeId);
+            List<StatisticResponse>? statisticListForTheGrade = GetAllByParameter(null, gradeId);
+
+            // Group by TimeStamp Date and calculate the average Score for each group
+            List<StatisticResponse> statisticListWithAvgScores = statisticListForTheGrade.GroupBy(
+                statisticResponse => statisticResponse.TimeStamp.Date,
+                statisticResponse => statisticResponse,
+                (key, val) =>
+
+                    new StatisticResponse
+                    {
+                        GradeId = val.ToList()[0].GradeId,
+                        Score = val.Average(x => x.Score),
+                        TimeStamp = key
+                    })
+
+                    .ToList();
+
+            return statisticListWithAvgScores;
         }
 
-        private List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId)
+        public static List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId)
         {
             string parameterString = "";
 
