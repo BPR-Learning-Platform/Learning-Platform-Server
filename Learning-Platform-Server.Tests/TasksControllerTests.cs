@@ -23,7 +23,7 @@ namespace Learning_Platform_Server.Tests
 
         public TasksControllerTests(ITestOutputHelper output)
         {
-            this._output = output;
+            _output = output;
         }
 
 

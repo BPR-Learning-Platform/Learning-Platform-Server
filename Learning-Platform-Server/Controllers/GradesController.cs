@@ -1,5 +1,6 @@
 ﻿using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Grades;
+using Learning_Platform_Server.Models.Statistics;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
