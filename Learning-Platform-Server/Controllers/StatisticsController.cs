@@ -14,12 +14,10 @@ namespace Learning_Platform_Server.Controllers
     public class StatisticsController : ControllerBase
     {
         private readonly IStatisticService _statisticService;
-        private ILogger<StatisticsController> _logger;
 
-        public StatisticsController(IStatisticService statisticService, ILogger<StatisticsController> logger)
+        public StatisticsController(IStatisticService statisticService)
         {
             _statisticService = statisticService;
-            _logger = logger;
         }
 
         [HttpGet]

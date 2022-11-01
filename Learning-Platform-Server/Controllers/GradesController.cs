@@ -15,12 +15,10 @@ namespace Learning_Platform_Server.Controllers
     public class GradesController : ControllerBase
     {
         private readonly IGradeService _gradeService;
-        private ILogger<GradesController> _logger;
 
-        public GradesController(IGradeService gradeService, ILogger<GradesController> logger)
+        public GradesController(IGradeService gradeService)
         {
             _gradeService = gradeService;
-            _logger = logger;
         }
 
         [HttpGet]

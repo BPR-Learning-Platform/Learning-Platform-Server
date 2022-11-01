@@ -7,11 +7,15 @@ namespace Learning_Platform_Server.Helpers
 {
     public interface ICacheHandler
     {
+        // USERS
         void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse);
         void ResetCachedUserList(UserResponse userResponse);
         UserResponse GetUserResponseFromCache(string userId);
         void EnsureCaching(UserResponse userResponse);
+
+        // GRADES
         List<GradeResponse> GetGradeResponseListFromCache();
+        int GetStep(string userid);
     }
 
     public class CacheHandler : ICacheHandler
@@ -68,12 +72,12 @@ namespace Learning_Platform_Server.Helpers
 
             if (_cache.TryGetValue(UserListCacheKey, out IEnumerable<UserResponse> users))
             {
-                _logger.Log(LogLevel.Information, "User list found in cache.");
+                _logger.Log(LogLevel.Information, "Cached UserList found.");
                 userResponse = users.FirstOrDefault(x => x.UserId is not null && x.UserId.Equals(userId));
 
                 if (userResponse is null)
                 {
-                    _logger.Log(LogLevel.Information, "User id not found in user list");
+                    _logger.Log(LogLevel.Information, "User id not found in Cached UserList. Calling UserService and adding user to cache.");
 
                     userResponse = _userService.GetById(userId);
                     if (userResponse is null)
@@ -84,7 +88,7 @@ namespace Learning_Platform_Server.Helpers
             }
             else
             {
-                _logger.Log(LogLevel.Information, "User list not found in cache.");
+                _logger.Log(LogLevel.Information, "Cached UserList not found. Calling UserService and resetting cache.");
 
                 userResponse = _userService.GetById(userId);
                 if (userResponse is null)
@@ -102,7 +106,7 @@ namespace Learning_Platform_Server.Helpers
 
             if (_cache.TryGetValue(UserListCacheKey, out IEnumerable<UserResponse> users))
             {
-                _logger.Log(LogLevel.Information, "User list found in cache.");
+                _logger.Log(LogLevel.Information, "Cached UserList found.");
 
                 if (!users.Any(x => x.Email is not null && x.Email.Equals(userResponse.Email)))
                 {
@@ -112,7 +116,7 @@ namespace Learning_Platform_Server.Helpers
             }
             else
             {
-                _logger.Log(LogLevel.Information, "User list not found in cache.");
+                _logger.Log(LogLevel.Information, "Cached UserList not found. Resetting cache and adding user.");
                 ResetCachedUserList(userResponse);
             }
         }
@@ -127,12 +131,12 @@ namespace Learning_Platform_Server.Helpers
 
             if (_cache.TryGetValue(GradeListCacheKey, out IEnumerable<GradeResponse> grades))
             {
-                _logger.Log(LogLevel.Information, "Grade list found in cache.");
+                _logger.Log(LogLevel.Information, "Cached GradeList found.");
                 gradeResponseList = grades.ToList();
             }
             else
             {
-                _logger.Log(LogLevel.Information, "Grade list not found in cache.");
+                _logger.Log(LogLevel.Information, "Cached GradeList not found. Calling GradeService and resetting cache.");
 
                 gradeResponseList = _gradeService.GetAll();
                 if (gradeResponseList is null)
@@ -146,9 +150,30 @@ namespace Learning_Platform_Server.Helpers
 
         private void ResetCachedGradeList(List<GradeResponse> gradeResponseList)
         {
-            Console.WriteLine("Resetting cached grade list");
+            Console.WriteLine("Resetting cached GradeList");
             List<GradeResponse>? newGradeResponseList = _cache.Set(GradeListCacheKey, gradeResponseList, CacheEntryOptions);
             newGradeResponseList.ForEach(x => Console.WriteLine(x));
+        }
+
+        public int GetStep(string userid)
+        {
+            UserResponse userResponse = GetUserResponseFromCache(userid);
+
+            if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
+                throw new Exception("No assignedgradeids were found for user with userid " + userid);
+
+            List<GradeResponse> gradeResponseList = GetGradeResponseListFromCache();
+
+            int assignedGradeId = userResponse.AssignedGradeIds[0];
+
+            GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
+            if (gradeResponse is null)
+                throw new Exception("No grade was found for gradeid " + assignedGradeId);
+
+            if (gradeResponse.Step is null)
+                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
+
+            return (int)gradeResponse.Step;
         }
     }
 }
