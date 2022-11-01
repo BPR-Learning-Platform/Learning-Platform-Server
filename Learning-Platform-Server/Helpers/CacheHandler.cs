@@ -8,13 +8,11 @@ namespace Learning_Platform_Server.Helpers
     public interface ICacheHandler
     {
         // USERS
-        void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse);
-        void ResetCachedUserList(UserResponse userResponse);
+        void UpdateCachedUser(UserResponse updatedUserResponse);
         UserResponse GetUserResponseFromCache(string userId);
         void EnsureCaching(UserResponse userResponse);
 
         // GRADES
-        List<GradeResponse> GetGradeResponseListFromCache();
         int GetStep(string userid);
     }
 
@@ -46,24 +44,21 @@ namespace Learning_Platform_Server.Helpers
 
         // USERS
 
-        public void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse)
+        public void UpdateCachedUser(UserResponse updatedUserResponse)
         {
-            Console.WriteLine("Adding user to cached userlist");
-            users = users.Append(userResponse);
-            SetCachedUserList(users);
-        }
+            UserResponse? userResponse;
 
-        public void ResetCachedUserList(UserResponse userResponse)
-        {
-            Console.WriteLine("Resetting cached user list and adding user");
-            List<UserResponse> userList = new() { userResponse };
-            SetCachedUserList(userList);
-        }
+            if (_cache.TryGetValue(UserListCacheKey, out IEnumerable<UserResponse> users))
+            {
+                userResponse = users.FirstOrDefault(x => x.UserId is not null && x.UserId.Equals(updatedUserResponse.UserId));
 
-        private void SetCachedUserList(IEnumerable<UserResponse> users)
-        {
-            users = _cache.Set(UserListCacheKey, users, CacheEntryOptions);
-            users.ToList().ForEach(x => Console.WriteLine(x));
+                if (userResponse is null)
+                    throw new Exception("User id not found in cached UserList.");
+
+                userResponse.Score = updatedUserResponse.Score;
+            }
+            else
+                throw new Exception("Cached UserList not found.");
         }
 
         public UserResponse GetUserResponseFromCache(string userId)
@@ -77,7 +72,7 @@ namespace Learning_Platform_Server.Helpers
 
                 if (userResponse is null)
                 {
-                    _logger.Log(LogLevel.Information, "User id not found in Cached UserList. Calling UserService and adding user to cache.");
+                    _logger.Log(LogLevel.Information, "User id not found in cached UserList. Calling UserService and adding user to cache.");
 
                     userResponse = _userService.GetById(userId);
                     if (userResponse is null)
@@ -121,11 +116,30 @@ namespace Learning_Platform_Server.Helpers
             }
         }
 
+        private void AddToCachedUserList(IEnumerable<UserResponse> users, UserResponse userResponse)
+        {
+            Console.WriteLine("Adding user to cached userlist");
+            users = users.Append(userResponse);
+            SetCachedUserList(users);
+        }
+        private void ResetCachedUserList(UserResponse userResponse)
+        {
+            Console.WriteLine("Resetting cached user list and adding user");
+            List<UserResponse> userList = new() { userResponse };
+            SetCachedUserList(userList);
+        }
+
+        private void SetCachedUserList(IEnumerable<UserResponse> users)
+        {
+            users = _cache.Set(UserListCacheKey, users, CacheEntryOptions);
+            users.ToList().ForEach(x => Console.WriteLine(x));
+        }
+
 
 
         // GRADES
 
-        public List<GradeResponse> GetGradeResponseListFromCache()
+        private List<GradeResponse> GetGradeResponseListFromCache()
         {
             List<GradeResponse>? gradeResponseList;
 

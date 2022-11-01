@@ -32,7 +32,7 @@ namespace Learning_Platform_Server.Entities
         public string? Name { get; set; }
         public string? Email { get; set; }
         public float? Score { get; set; }
-        public List<int>? AssignedGradeIds;
+        public List<int>? assignedgradeids { get; set; } //changed to lowercase to make put user work with database //TODO ?
 
         public override string ToString()
         {
@@ -40,7 +40,7 @@ namespace Learning_Platform_Server.Entities
                 ", name: " + Name +
                 ", email: " + Email +
                 ", score: " + Score +
-                ",\n\t" + "assignedGradeIds: \n\t" + (AssignedGradeIds is not null ? string.Join(",\n\t", AssignedGradeIds) : "");
+                ",\n\t" + "assignedGradeIds: \n\t" + (assignedgradeids is not null ? string.Join(",\n\t", assignedgradeids) : "");
 
         }
     }

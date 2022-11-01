@@ -14,11 +14,13 @@ namespace Learning_Platform_Server.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly IUserService _userService;
         private readonly ICacheHandler _cacheHelper;
 
-        public TasksController(ITaskService taskService, ICacheHandler cacheHelper)
+        public TasksController(ITaskService taskService, IUserService userService, ICacheHandler cacheHelper)
         {
             _taskService = taskService;
+            _userService = userService;
             _cacheHelper = cacheHelper;
         }
 
@@ -31,12 +33,29 @@ namespace Learning_Platform_Server.Controllers
             List<TaskResponse> taskResponseBatchList = new();
 
             Random random = new();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < Util.BatchSize; i++)
             {
                 taskResponseBatchList.Add(taskResponseList[random.Next(0, taskResponseList.Count)]);
             }
 
+            UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
+
+            // updating the users score asynchronously each time a new batch request is received
+            Task.Run(() => UpdateUserScore(userResponse, correct));
+
+            // for debugging
+            //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
+
             return Ok(taskResponseBatchList);
+        }
+
+        private void UpdateUserScore(UserResponse userResponse, int correct)
+        {
+            float? previousScore = (float?)userResponse.Score;
+            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correct);
+
+            _cacheHelper.UpdateCachedUser(updatedUserResponse);
+            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
         }
     }
 }
