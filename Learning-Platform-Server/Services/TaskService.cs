@@ -13,14 +13,14 @@ namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse>? GetAll(int step);
+        List<TaskResponse> GetAll(int step);
     }
 
     public class TaskService : ITaskService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/task";
 
-        public List<TaskResponse>? GetAll(int step)
+        public List<TaskResponse> GetAll(int step)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
@@ -45,6 +45,9 @@ namespace Learning_Platform_Server.Services
                     taskList.Add(taskResponse);
 
             }
+
+            if (taskList.Count == 0)
+                throw new Exception("Unable to read any tasks from task collection for step number " + step + " in the database.");
 
             return taskList;
         }

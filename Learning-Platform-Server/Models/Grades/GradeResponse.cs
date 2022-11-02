@@ -27,7 +27,7 @@ namespace Learning_Platform_Server.Models.Grades
         {
             return "GradeResponse: gradeid: " + GradeId +
                 ", name: " + GradeName +
-                ", students: " + (Students is not null ? string.Join(",", Students) : "");
+                ",\n\t" + "students: \n\t" + (Students is not null ? string.Join(",\n\t", Students) : "");
         }
     }
 }

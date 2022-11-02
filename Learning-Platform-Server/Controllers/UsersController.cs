@@ -14,24 +14,20 @@ namespace Learning_Platform_Server.Controllers
         private readonly IUserService _userService;
         private readonly ICacheHandler _cacheHelper;
 
-        private ILogger<UsersController> _logger;
-
-        public UsersController(IUserService userService, ICacheHandler cacheHelper, ILogger<UsersController> logger)
+        public UsersController(IUserService userService, ICacheHandler cacheHelper)
         {
             _userService = userService;
             _cacheHelper = cacheHelper;
-
-            _logger = logger;
         }
 
         [HttpPost("signin")]
-        public ContentResult SignIn([FromBody] SignInRequest signInRequest)
+        public ActionResult<UserResponse> SignIn([FromBody] SignInRequest signInRequest)
         {
             UserResponse userResponse = _userService.SignInUser(signInRequest);
 
             _cacheHelper.EnsureCaching(userResponse);
 
-            return new ContentResult() { StatusCode = StatusCodes.Status200OK, Content = userResponse.ToJson() };
+            return Ok(userResponse);
         }
     }
 }

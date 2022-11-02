@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
 
@@ -15,6 +16,8 @@ namespace Learning_Platform_Server.Services
         UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
+        UserResponse UpdateUserScore(UserResponse userResponse, int correct);
+        float CalculateNewScore(float score, int correct);
     }
 
     public class UserService : IUserService
@@ -98,8 +101,84 @@ namespace Learning_Platform_Server.Services
             return userList;
         }
 
+        public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
+        {
+            if (userResponse.Score is null)
+                throw new NullReferenceException("No score was found for the user: " + userResponse);
+
+            userResponse.Score = CalculateNewScore((float)userResponse.Score, correct);
+
+            UpdateUser(userResponse, correct);
+
+            // returning an updated version of the same user-object, since the database does not return the updated user
+            return userResponse;
+        }
+
+
 
         // helper methods
+
+        public float CalculateNewScore(float score, int correct)
+        {
+            float correctNumber = 0;
+            if (correct > 0)
+                correctNumber = correct / 100 * Util.BatchSize;
+
+            float incorrectNumber = Util.BatchSize - correctNumber;
+
+            // increase/decrease score with 0.1 points for each correct/incorrect answer
+            float change = (correctNumber - incorrectNumber) / 10;
+            float newScore = score + change;
+
+            //rounding the result
+            newScore = (float)Math.Round((newScore), 2);
+
+            return newScore;
+        }
+
+        private static HttpResponseMessage UpdateUser(UserResponse userResponse, int correct)
+        {
+            MongoDbUser mongoDbUser = MapToMongoDbUser(userResponse);
+            HttpRequestMessage request = new(new HttpMethod("PUT"), Url)
+            {
+                Content = JsonContent.Create(mongoDbUser)
+            };
+
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
+
+            // throws an exception if the PUT request went wrong
+            ValidateMongoDbPutRequestResponse(mongoDbUser, httpResponseMessage);
+
+            return httpResponseMessage;
+        }
+
+        private static void ValidateMongoDbPutRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)
+        {
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode);
+
+            string? responseString = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            JObject? responseJobject = (JObject?)Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
+
+            if (responseJobject is null)
+                throw new Exception();
+
+            JToken? upsertedIdJToken = responseJobject["upsertedId"];
+            JToken? matchedCountJToken = responseJobject["matchedCount"];
+            JToken? modifiedCountJToken = responseJobject["modifiedCount"];
+
+            if (upsertedIdJToken is not null)
+                throw new Exception("Database inserted a new user instead of updating an existing user. Details: " + mongoDbUser);
+
+            if (matchedCountJToken is null || modifiedCountJToken is null)
+                throw new Exception("Database did not return expected details. The user might not have been updated. Details: " + mongoDbUser);
+
+            int matchedCount = int.Parse(matchedCountJToken.ToString());
+            int modifiedCount = int.Parse(modifiedCountJToken.ToString());
+
+            if (matchedCount != 1 || modifiedCount != 1)
+                throw new Exception("Database did not behave as expected Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
+        }
 
         private static MongoDbUserRoot? MapToMongoDbUserRoot(BsonValue userRootBsonValue)
         {
@@ -133,7 +212,18 @@ namespace Learning_Platform_Server.Services
                 Name = mongoDbUserRoot.User.Name,
                 Email = mongoDbUserRoot.User.Email,
                 Score = mongoDbUserRoot.User.Score,
-                AssignedGradeIds = mongoDbUserRoot.User.AssignedGradeIds
+                AssignedGradeIds = mongoDbUserRoot.User.assignedgradeids
+            };
+        }
+        private static MongoDbUser MapToMongoDbUser(UserResponse userResponse)
+        {
+            return new MongoDbUser()
+            {
+                Type = userResponse.Type,
+                Name = userResponse.Name,
+                Email = userResponse.Email,
+                Score = userResponse.Score,
+                assignedgradeids = userResponse.AssignedGradeIds
             };
         }
     }

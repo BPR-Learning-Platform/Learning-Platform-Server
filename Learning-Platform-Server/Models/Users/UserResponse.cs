@@ -18,7 +18,7 @@ namespace Learning_Platform_Server.Models.Users
                 ", name: " + Name +
                 ", email: " + Email +
                 ", score: " + Score +
-                ", assignedGradeIds: " + (AssignedGradeIds is not null ? string.Join(",", AssignedGradeIds) : "");
+                ",\n\t" + "assignedGradeIds: \n\t" + (AssignedGradeIds is not null ? string.Join(",\n\t", AssignedGradeIds) : "");
         }
     }
 

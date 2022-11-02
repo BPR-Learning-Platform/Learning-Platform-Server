@@ -14,57 +14,48 @@ namespace Learning_Platform_Server.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        private readonly IGradeService _gradeService;
+        private readonly IUserService _userService;
         private readonly ICacheHandler _cacheHelper;
 
-        private ILogger<TasksController> _logger;
-
-        public TasksController(ITaskService taskService, IGradeService gradeService, ICacheHandler cacheHelper, ILogger<TasksController> logger)
+        public TasksController(ITaskService taskService, IUserService userService, ICacheHandler cacheHelper)
         {
             _taskService = taskService;
-            _gradeService = gradeService;
+            _userService = userService;
             _cacheHelper = cacheHelper;
-
-            _logger = logger;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct)
         {
-            UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
-
-            if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
-                throw new Exception("No assignedgradeids were found for user with userid " + userid);
-
-            List<GradeResponse> gradeResponseList = _cacheHelper.GetGradeResponseListFromCache();
-
-            int assignedGradeId = userResponse.AssignedGradeIds[0];
-
-            GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
-            if (gradeResponse is null)
-                throw new Exception("No grade was found for gradeid " + assignedGradeId);
-
-            if (gradeResponse.Step is null)
-                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
-
-            List<TaskResponse>? taskResponseList = _taskService.GetAll((int)gradeResponse.Step);
+            int step = _cacheHelper.GetStep(userid);
+            List<TaskResponse> taskResponseList = _taskService.GetAll(step);
 
             List<TaskResponse> taskResponseBatchList = new();
 
             Random random = new();
-
-            if (taskResponseList is not null)
+            for (int i = 0; i < Util.BatchSize; i++)
             {
-                if (taskResponseList.Count == 0)
-                    throw new Exception("Unable to read any tasks from task collection for step number " + gradeResponse.Step + " in the database.");
-
-                for (int i = 0; i < 3; i++)
-                {
-                    taskResponseBatchList.Add(taskResponseList[random.Next(0, taskResponseList.Count())]);
-                }
+                taskResponseBatchList.Add(taskResponseList[random.Next(0, taskResponseList.Count)]);
             }
 
+            UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
+
+            // updating the users score asynchronously each time a new batch request is received
+            Task.Run(() => UpdateUserScore(userResponse, correct));
+
+            // for debugging
+            //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
+
             return Ok(taskResponseBatchList);
+        }
+
+        private void UpdateUserScore(UserResponse userResponse, int correct)
+        {
+            float? previousScore = (float?)userResponse.Score;
+            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correct);
+
+            _cacheHelper.UpdateCachedUser(updatedUserResponse);
+            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
         }
     }
 }
