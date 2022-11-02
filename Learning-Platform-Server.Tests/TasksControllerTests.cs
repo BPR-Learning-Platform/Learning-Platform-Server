@@ -64,7 +64,7 @@ namespace Learning_Platform_Server.Tests
         {
             string userId = "51";
 
-            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + 100);
+            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + 100 + "&taskids=42,12,18");
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
             string? responseContentString = httpResponseMessage.Content.ReadAsStringAsync().Result;
