@@ -25,17 +25,33 @@ namespace Learning_Platform_Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct)
+        public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct, [FromQuery] string taskids)
         {
             int step = _cacheHelper.GetStep(userid);
             List<TaskResponse> taskResponseList = _taskService.GetAll(step);
 
             List<TaskResponse> taskResponseBatchList = new();
 
+            // The query parameter for task ids looks like this: "taskids=58,7,42"
+            List<string> previousTaskIds = taskids.Split(',').ToList();
             Random random = new();
             for (int i = 0; i < Util.BatchSize; i++)
             {
-                taskResponseBatchList.Add(taskResponseList[random.Next(0, taskResponseList.Count)]);
+                bool same = true;
+                TaskResponse? taskToAdd = null;
+                do
+                {
+                    taskToAdd = taskResponseList[random.Next(0, taskResponseList.Count)];
+
+                    // not sending tasks that were sent in the previous batch
+                    if (taskToAdd is not null && taskToAdd.TaskId is not null && !previousTaskIds.Contains(taskToAdd.TaskId)
+                        // sending unique tasks only
+                        && !taskResponseBatchList.Any(x => x.TaskId is not null && x.TaskId.Equals(taskToAdd.TaskId)))
+                    {
+                        taskResponseBatchList.Add(taskToAdd);
+                        same = false;
+                    }
+                } while (same);
             }
 
             UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
