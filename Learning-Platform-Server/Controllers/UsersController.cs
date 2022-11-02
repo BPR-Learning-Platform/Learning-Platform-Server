@@ -29,5 +29,13 @@ namespace Learning_Platform_Server.Controllers
 
             return Ok(userResponse);
         }
+
+        [HttpPost]
+        public OkResult Create([FromBody] CreateUserRequest createUserRequest)
+        {
+            _userService.Create(createUserRequest);
+
+            return Ok();
+        }
     }
 }

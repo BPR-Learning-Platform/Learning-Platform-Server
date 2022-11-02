@@ -31,6 +31,7 @@ namespace Learning_Platform_Server.Entities
         public string? Type { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
+        public string? Password { get; set; }
         public float? Score { get; set; }
         public List<int>? assignedgradeids { get; set; } //changed to lowercase to make put user work with database //TODO ?
 
@@ -39,6 +40,7 @@ namespace Learning_Platform_Server.Entities
             return "MongoDBUser: type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
+                ", password: " + Password +
                 ", score: " + Score +
                 ",\n\t" + "assignedGradeIds: \n\t" + (assignedgradeids is not null ? string.Join(",\n\t", assignedgradeids) : "");
 
