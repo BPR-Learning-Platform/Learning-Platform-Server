@@ -16,6 +16,7 @@ namespace Learning_Platform_Server.Services
         UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
+        void Create(CreateUserRequest createUserRequest);
         UserResponse UpdateUserScore(UserResponse userResponse, int correct);
         float CalculateNewScore(float score, int correct);
     }
@@ -99,6 +100,37 @@ namespace Learning_Platform_Server.Services
             }
 
             return userList;
+        }
+
+        public void Create(CreateUserRequest createUserRequest)
+        {
+            MongoDbUser mongoDbUser = MapToMongoDbUser(createUserRequest);
+            HttpRequestMessage request = new(new HttpMethod("POST"), Url)
+            {
+                Content = JsonContent.Create(mongoDbUser)
+            };
+
+            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
+
+            // throws an exception if the PUT request went wrong
+            ValidateMongoDbPostRequestResponse(mongoDbUser, httpResponseMessage);
+        }
+
+        private static void ValidateMongoDbPostRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)
+        {
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode);
+
+            string? responseString = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            JObject? responseJobject = (JObject?)Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
+
+            if (responseJobject is null)
+                throw new Exception();
+
+            JToken? upsertedIdJToken = responseJobject["upsertedId"];
+
+            if (upsertedIdJToken is null)
+                throw new Exception("Database did not insert a new user instead of updating an existing user. Details: " + mongoDbUser);
         }
 
         public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
@@ -224,6 +256,19 @@ namespace Learning_Platform_Server.Services
                 Email = userResponse.Email,
                 Score = userResponse.Score,
                 assignedgradeids = userResponse.AssignedGradeIds
+            };
+        }
+
+        private static MongoDbUser MapToMongoDbUser(CreateUserRequest createUserRequest)
+        {
+            return new MongoDbUser()
+            {
+                Type = createUserRequest.Type,
+                Name = createUserRequest.Name,
+                Email = createUserRequest.Email,
+                Password = createUserRequest.Password,
+                Score = 0,
+                assignedgradeids = createUserRequest.AssignedGradeIds
             };
         }
     }
