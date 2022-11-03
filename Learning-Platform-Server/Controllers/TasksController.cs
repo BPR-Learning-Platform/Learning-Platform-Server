@@ -25,15 +25,19 @@ namespace Learning_Platform_Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct, [FromQuery] string taskids)
+        public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct, [FromQuery] string? taskids)
         {
             int step = _cacheHelper.GetStep(userid);
             List<TaskResponse> taskResponseList = _taskService.GetAll(step);
 
             List<TaskResponse> taskResponseBatchList = new();
 
+            List<string> previousTaskIds = new();
+
             // The query parameter for task ids looks like this: "taskids=58,7,42"
-            List<string> previousTaskIds = taskids.Split(',').ToList();
+            if (taskids is not null)
+                previousTaskIds = taskids.Split(',').ToList();
+
             Random random = new();
             for (int i = 0; i < Util.BatchSize; i++)
             {
