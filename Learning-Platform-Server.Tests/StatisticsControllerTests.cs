@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Flurl.Http.Testing;
 using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Statistics;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +22,13 @@ using Xunit.Abstractions;
 
 namespace Learning_Platform_Server.Tests
 {
-    public class StatisticsControllerTests : IClassFixture<StatisticDAO>
+    public class StatisticsControllerTests
     {
         private const string StatisticsUrl = "/statistics";
-        private readonly IStatisticDAO _statisticDAO;
         private readonly ITestOutputHelper _output;
 
-        public StatisticsControllerTests(StatisticDAO statisticDAO, ITestOutputHelper output)
+        public StatisticsControllerTests(ITestOutputHelper output)
         {
-            _statisticDAO = statisticDAO;
             _output = output;
         }
 
@@ -54,8 +54,11 @@ namespace Learning_Platform_Server.Tests
             {
                 TestStatisticList(statisticListWithAvgScores, true);
 
+                IHttpClientFactory? httpClientFactoryMock = GetHttpClientFactoryMock();
+                StatisticDAO? statisticDAO = new(httpClientFactoryMock);
+                List<StatisticResponse> statisticListForTheGrade = statisticDAO.GetAllByParameter(null, gradeId);
+
                 // Score: The average score should be correct
-                List<StatisticResponse> statisticListForTheGrade = _statisticDAO.GetAllByParameter(null, gradeId);
                 EnsureCorrectAvgScoreCalculation(statisticListWithAvgScores, statisticListForTheGrade);
             }
         }
@@ -142,6 +145,20 @@ namespace Learning_Platform_Server.Tests
 
                 scoreToCheck.Should().BeApproximately(avgScoreFound, 0.001f);
             }
+        }
+
+        private static IHttpClientFactory GetHttpClientFactoryMock()
+        {
+            IHttpClientFactory? httpClientFactoryMock = Substitute.For<IHttpClientFactory>();
+
+            HttpClient httpClient = new()
+            {
+                BaseAddress = new Uri("https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/")
+            };
+
+            httpClientFactoryMock.CreateClient("MongoDB").Returns(httpClient);
+
+            return httpClientFactoryMock;
         }
     }
 }

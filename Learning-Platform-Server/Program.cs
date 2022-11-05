@@ -34,7 +34,6 @@ services.AddScoped<GradeService>();
 services.AddScoped<IGradeService, GradeServiceWithCache>();
 services.AddScoped<IStatisticService, StatisticService>();
 
-
 services.AddCors(options =>
 {
     options.AddPolicy(name: allowSpecificOrigins,
@@ -44,6 +43,11 @@ services.AddCors(options =>
                                 "http://localhost:4200")
                     .AllowAnyHeader();
         });
+});
+
+services.AddHttpClient("MongoDB", options =>
+{
+    options.BaseAddress = new Uri("https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/");
 });
 
 var app = builder.Build();

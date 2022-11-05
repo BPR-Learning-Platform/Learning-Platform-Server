@@ -18,12 +18,17 @@ namespace Learning_Platform_Server.DAOs
 
     public class TaskDAO : ITaskDAO
     {
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/task";
+        private readonly HttpClient _httpClient;
+
+        public TaskDAO(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient("MongoDB");
+        }
 
         public List<TaskResponse> GetAll(int step)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "task?step=" + step);
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             List<TaskResponse> taskList = new();
 

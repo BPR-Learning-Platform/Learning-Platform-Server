@@ -19,7 +19,12 @@ namespace Learning_Platform_Server.DAOs
 
     public class StatisticDAO : IStatisticDAO
     {
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/statistic";
+        private readonly HttpClient _httpClient;
+
+        public StatisticDAO(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient("MongoDB");
+        }
 
         public List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId)
         {
@@ -30,8 +35,8 @@ namespace Learning_Platform_Server.DAOs
             else if (gradeId.HasValue)
                 parameterString = "?gradeid=" + gradeId;
 
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + parameterString);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "statistic" + parameterString);
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             List<StatisticResponse> statisticList = new();
 

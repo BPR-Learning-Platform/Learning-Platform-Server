@@ -21,16 +21,21 @@ namespace Learning_Platform_Server.DAOs
 
     public class UserDAO : IUserDAO
     {
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/user";
+        private readonly HttpClient _httpClient;
+
+        public UserDAO(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient("MongoDB");
+        }
 
         public UserResponse SignInUser(SignInRequest signInRequest)
         {
-            HttpRequestMessage request = new(new HttpMethod("POST"), Url + "/signin")
+            HttpRequestMessage request = new(new HttpMethod("POST"), "user/signin")
             {
                 Content = JsonContent.Create(signInRequest)
             };
 
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(request).Result;
             BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
             if (userRootBsonArray.Count == 0)
                 throw new UnauthorizedAccessException("No user was found with the given credentials");
@@ -48,8 +53,8 @@ namespace Learning_Platform_Server.DAOs
 
         public UserResponse? GetById(string id)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?userid=" + id);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "user?userid=" + id);
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
@@ -73,8 +78,8 @@ namespace Learning_Platform_Server.DAOs
 
         public List<UserResponse> GetByGradeId(int gradeId)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/wholegrade" + "?assignedgradeid=" + gradeId);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "wholegrade?assignedgradeid=" + gradeId);
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
@@ -103,12 +108,12 @@ namespace Learning_Platform_Server.DAOs
         public void UpdateUser(UserResponse userResponse)
         {
             MongoDbUser mongoDbUser = MapToMongoDbUser(userResponse);
-            HttpRequestMessage request = new(new HttpMethod("PUT"), Url)
+            HttpRequestMessage request = new(new HttpMethod("PUT"), "user")
             {
                 Content = JsonContent.Create(mongoDbUser)
             };
 
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(request).Result;
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(request).Result;
 
             // throws an exception if the PUT request went wrong
             ValidateMongoDbPutRequestResponse(mongoDbUser, httpResponseMessage);

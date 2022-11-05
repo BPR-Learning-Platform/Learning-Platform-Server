@@ -21,13 +21,17 @@ namespace Learning_Platform_Server.DAOs
 
     public class GradeDAO : IGradeDAO
     {
+        private readonly HttpClient _httpClient;
 
-        private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/grade";
+        public GradeDAO(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient("MongoDB");
+        }
 
         public List<GradeResponse> GetAll()
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade");
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             List<GradeResponse> gradeList = new();
 
@@ -55,8 +59,8 @@ namespace Learning_Platform_Server.DAOs
 
         public GradeResponse? GetById(int id)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?id=" + id);
-            HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?id=" + id);
+            HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
