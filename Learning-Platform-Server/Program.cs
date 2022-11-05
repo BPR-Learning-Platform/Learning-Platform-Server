@@ -45,10 +45,13 @@ services.AddCors(options =>
         });
 });
 
+string? mongoDbBaseUrl = builder.Configuration.GetConnectionString("MongoDbBaseUrl");
+
 services.AddHttpClient("MongoDB", options =>
 {
-    options.BaseAddress = new Uri("https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/");
+    options.BaseAddress = new Uri(mongoDbBaseUrl);
 });
+
 
 var app = builder.Build();
 

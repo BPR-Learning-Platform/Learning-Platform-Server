@@ -51,7 +51,7 @@ namespace Learning_Platform_Server.Services
             if (teacher.AssignedGradeIds is null)
                 throw new NullReferenceException("No assigned grade ids were found for the teacher: " + teacher);
 
-            List<GradeResponse> gradeResponses = GetAll(); //TODO Use caching instead ?
+            List<GradeResponse> gradeResponses = GetAll();
 
             List<GradeResponseToTeacher> gradeResponsesToTeacher = new();
 
