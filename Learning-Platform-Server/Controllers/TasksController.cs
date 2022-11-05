@@ -14,14 +14,10 @@ namespace Learning_Platform_Server.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        private readonly IUserService _userService;
-        private readonly IGradeService _gradeService;
 
-        public TasksController(ITaskService taskService, IUserService userService, IGradeService gradeService)
+        public TasksController(ITaskService taskService)
         {
             _taskService = taskService;
-            _userService = userService;
-            _gradeService = gradeService;
         }
 
         [HttpGet]
