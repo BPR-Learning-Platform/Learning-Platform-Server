@@ -15,19 +15,24 @@ namespace Learning_Platform_Server.Controllers
     {
         private readonly ITaskService _taskService;
         private readonly IUserService _userService;
-        private readonly ICacheHandler _cacheHelper;
+        private readonly IGradeService _gradeService;
 
-        public TasksController(ITaskService taskService, IUserService userService, ICacheHandler cacheHelper)
+        public TasksController(ITaskService taskService, IUserService userService, IGradeService gradeService)
         {
             _taskService = taskService;
             _userService = userService;
-            _cacheHelper = cacheHelper;
+            _gradeService = gradeService;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct, [FromQuery] string? taskids)
         {
-            int step = _cacheHelper.GetStep(userid);
+            UserResponse? userResponse = _userService.GetById(userid);
+
+            if (userResponse is null)
+                throw new Exception("No user was found for userid " + userid);
+
+            int step = _gradeService.GetStep(userResponse);
             List<TaskResponse> taskResponseList = _taskService.GetAll(step);
 
             List<TaskResponse> taskResponseBatchList = new();
@@ -58,24 +63,13 @@ namespace Learning_Platform_Server.Controllers
                 } while (same);
             }
 
-            UserResponse userResponse = _cacheHelper.GetUserResponseFromCache(userid);
-
             // updating the users score asynchronously each time a new batch request is received
-            Task.Run(() => UpdateUserScore(userResponse, correct));
+            Task.Run(() => _userService.UpdateUserScore(userResponse, correct));
 
             // for debugging
             //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
 
             return Ok(taskResponseBatchList);
-        }
-
-        private void UpdateUserScore(UserResponse userResponse, int correct)
-        {
-            float? previousScore = (float?)userResponse.Score;
-            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correct);
-
-            _cacheHelper.UpdateCachedUser(updatedUserResponse);
-            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
         }
     }
 }

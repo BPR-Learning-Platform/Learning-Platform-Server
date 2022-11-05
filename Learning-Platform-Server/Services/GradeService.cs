@@ -14,9 +14,10 @@ namespace Learning_Platform_Server.Services
 {
     public interface IGradeService
     {
-        List<GradeResponse>? GetAll();
-        List<GradeResponseToTeacher>? GetAllToTeacher(string teacherId);
+        List<GradeResponse> GetAll();
+        List<GradeResponseToTeacher> GetAllToTeacher(string teacherId);
         GradeResponse? GetById(int id);
+        int GetStep(UserResponse userResponse);
     }
 
     public class GradeService : IGradeService
@@ -59,7 +60,7 @@ namespace Learning_Platform_Server.Services
             return gradeList;
         }
 
-        public List<GradeResponseToTeacher>? GetAllToTeacher(string teacherId)
+        public List<GradeResponseToTeacher> GetAllToTeacher(string teacherId)
         {
             UserResponse? teacher = _userService.GetById(teacherId);
 
@@ -178,6 +179,23 @@ namespace Learning_Platform_Server.Services
             };
         }
 
+        public int GetStep(UserResponse userResponse)
+        {
+            if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
+                throw new Exception("No assignedgradeids were found for user with userid " + userResponse.UserId);
 
+            List<GradeResponse> gradeResponseList = GetAll();
+
+            int assignedGradeId = userResponse.AssignedGradeIds[0];
+
+            GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
+            if (gradeResponse is null)
+                throw new Exception("No grade was found for gradeid " + assignedGradeId);
+
+            if (gradeResponse.Step is null)
+                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
+
+            return (int)gradeResponse.Step;
+        }
     }
 }

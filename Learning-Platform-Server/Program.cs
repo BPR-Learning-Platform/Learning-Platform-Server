@@ -19,11 +19,11 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 // configure DI for application services
-services.AddScoped<IUserService, UserService>();
+services.AddScoped<UserService>();
+services.AddScoped<IUserService, UserServiceWithCache>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IGradeService, GradeService>();
 services.AddScoped<IStatisticService, StatisticService>();
-services.AddScoped<ICacheHandler, CacheHandler>();
 
 services.AddCors(options =>
 {

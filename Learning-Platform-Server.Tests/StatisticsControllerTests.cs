@@ -52,7 +52,7 @@ namespace Learning_Platform_Server.Tests
                 TestStatisticList(statisticListWithAvgScores, true);
 
                 // Score: The average score should be correct
-                List<StatisticResponse>? statisticListForTheGrade = StatisticService.GetAllByParameter(null, gradeId);
+                List<StatisticResponse> statisticListForTheGrade = StatisticService.GetAllByParameter(null, gradeId);
                 EnsureCorrectAvgScoreCalculation(statisticListWithAvgScores, statisticListForTheGrade);
             }
         }
@@ -123,7 +123,7 @@ namespace Learning_Platform_Server.Tests
                 float? scoreToCheck = statisticResponse.Score;
 
                 float totalScoreFound = 0;
-                List<StatisticResponse>? statisticListToCheck = statisticList.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
+                List<StatisticResponse> statisticListToCheck = statisticList.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
                 _output.WriteLine("statisticListToCheck: " + string.Join(",", statisticListToCheck));
 
                 foreach (StatisticResponse? statisticToCheck in statisticListToCheck)
