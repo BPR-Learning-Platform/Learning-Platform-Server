@@ -13,14 +13,62 @@ namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetAll(int step);
+        List<TaskResponse> GetBatch(string userid, int correct, List<string> previousTaskIds);
     }
 
     public class TaskService : ITaskService
     {
         private static readonly string Url = "https://westeurope.azure.data.mongodb-api.com/app/application-1-vuehv/endpoint/task";
+        private readonly IUserService _userService;
+        private readonly IGradeService _gradeService;
 
-        public List<TaskResponse> GetAll(int step)
+        public TaskService(IUserService userService, IGradeService gradeService)
+        {
+            _userService = userService;
+            _gradeService = gradeService;
+        }
+
+        public List<TaskResponse> GetBatch(string userid, int correct, List<string> previousTaskIds)
+        {
+            UserResponse? userResponse = _userService.GetById(userid);
+
+            if (userResponse is null)
+                throw new Exception("No user was found for userid " + userid);
+
+            int step = _gradeService.GetStep(userResponse);
+            List<TaskResponse> taskResponseList = GetAll(step);
+
+            List<TaskResponse> taskResponseBatchList = new();
+            Random random = new();
+            for (int i = 0; i < Util.BatchSize; i++)
+            {
+                bool same = true;
+                TaskResponse? taskToAdd = null;
+                do
+                {
+                    taskToAdd = taskResponseList[random.Next(0, taskResponseList.Count)];
+
+                    // not sending tasks that were sent in the previous batch
+                    if (taskToAdd is not null && taskToAdd.TaskId is not null && !previousTaskIds.Contains(taskToAdd.TaskId)
+                        // sending unique tasks only
+                        && !taskResponseBatchList.Any(x => x.TaskId is not null && x.TaskId.Equals(taskToAdd.TaskId)))
+                    {
+                        taskResponseBatchList.Add(taskToAdd);
+                        same = false;
+                    }
+                } while (same);
+            }
+
+            // updating the users score asynchronously each time a new batch request is received
+            Task.Run(() => _userService.UpdateUserScore(userResponse, correct));
+
+            // for debugging
+            //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
+
+            return taskResponseBatchList;
+        }
+
+        private static List<TaskResponse> GetAll(int step)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), Url + "?step=" + step);
             HttpResponseMessage httpResponseMessage = MongoDbHelper.GetHttpClient().SendAsync(httpRequestMessage).Result;

@@ -27,47 +27,10 @@ namespace Learning_Platform_Server.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<TaskResponse>> GetBatch([FromQuery] string userid, [FromQuery] int correct, [FromQuery] string? taskids)
         {
-            UserResponse? userResponse = _userService.GetById(userid);
-
-            if (userResponse is null)
-                throw new Exception("No user was found for userid " + userid);
-
-            int step = _gradeService.GetStep(userResponse);
-            List<TaskResponse> taskResponseList = _taskService.GetAll(step);
-
-            List<TaskResponse> taskResponseBatchList = new();
-
-            List<string> previousTaskIds = new();
-
             // The query parameter for task ids looks like this: "taskids=58,7,42"
-            if (taskids is not null)
-                previousTaskIds = taskids.Split(',').ToList();
+            List<string> previousTaskIds = taskids is not null ? taskids.Split(',').ToList() : new();
 
-            Random random = new();
-            for (int i = 0; i < Util.BatchSize; i++)
-            {
-                bool same = true;
-                TaskResponse? taskToAdd = null;
-                do
-                {
-                    taskToAdd = taskResponseList[random.Next(0, taskResponseList.Count)];
-
-                    // not sending tasks that were sent in the previous batch
-                    if (taskToAdd is not null && taskToAdd.TaskId is not null && !previousTaskIds.Contains(taskToAdd.TaskId)
-                        // sending unique tasks only
-                        && !taskResponseBatchList.Any(x => x.TaskId is not null && x.TaskId.Equals(taskToAdd.TaskId)))
-                    {
-                        taskResponseBatchList.Add(taskToAdd);
-                        same = false;
-                    }
-                } while (same);
-            }
-
-            // updating the users score asynchronously each time a new batch request is received
-            Task.Run(() => _userService.UpdateUserScore(userResponse, correct));
-
-            // for debugging
-            //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
+            List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, correct, previousTaskIds);
 
             return Ok(taskResponseBatchList);
         }
