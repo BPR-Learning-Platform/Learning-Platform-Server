@@ -43,6 +43,9 @@ namespace Learning_Platform_Server.Services
             return userResponse;
         }
 
+        public void Create(CreateUserRequest createUserRequest)
+            => _userService.Create(createUserRequest);
+
         public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
         {
             float? previousScore = (float?)userResponse.Score;

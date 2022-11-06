@@ -17,6 +17,7 @@ namespace Learning_Platform_Server.Services
         UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse? GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
+        void Create(CreateUserRequest createUserRequest);
         UserResponse UpdateUserScore(UserResponse userResponse, int correct);
         float CalculateNewScore(float score, int correct);
     }
@@ -38,6 +39,9 @@ namespace Learning_Platform_Server.Services
 
         public List<UserResponse> GetByGradeId(int gradeId)
             => _userDAO.GetByGradeId(gradeId);
+
+        public void Create(CreateUserRequest createUserRequest)
+            => _userDAO.Create(createUserRequest);
 
         public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
         {
