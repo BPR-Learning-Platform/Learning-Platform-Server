@@ -152,7 +152,7 @@ namespace Learning_Platform_Server.DAOs
             JToken? upsertedIdJToken = responseJobject["upsertedId"];
 
             if (upsertedIdJToken is null)
-                throw new Exception("Database did not insert a new user instead of updating an existing user. Details: " + mongoDbUser);
+                throw new ArgumentException("Database did not create a new user. Maybe the email already existed. Details: " + mongoDbUser);
         }
 
         private static void ValidateMongoDbPutRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)

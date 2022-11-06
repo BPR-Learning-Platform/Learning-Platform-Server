@@ -30,7 +30,13 @@ namespace Learning_Platform_Server.Entities
     {
         public string? Type { get; set; }
         public string? Name { get; set; }
-        public string? Email { get; set; }
+
+        private string? _email;
+        public string? Email
+        {
+            get { return _email; }
+            set { _email = ("" + value).ToLower(); }
+        }
         public string? Password { get; set; }
         public float? Score { get; set; }
         public List<int>? assignedgradeids { get; set; } //changed to lowercase to make put user work with database //TODO ?

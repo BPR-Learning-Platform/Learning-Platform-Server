@@ -27,11 +27,10 @@ namespace Learning_Platform_Server.Controllers
         }
 
         [HttpPost]
-        public OkResult Create([FromBody] CreateUserRequest createUserRequest)
+        public ActionResult Create([FromBody] CreateUserRequest createUserRequest)
         {
             _userService.Create(createUserRequest);
-
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created);
         }
     }
 }
