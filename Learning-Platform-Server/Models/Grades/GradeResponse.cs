@@ -1,5 +1,6 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Models.Users;
+using System.Text.Json.Serialization;
 
 namespace Learning_Platform_Server.Models.Grades
 {
@@ -21,6 +22,8 @@ namespace Learning_Platform_Server.Models.Grades
     {
         public string? GradeId { get; set; }
         public string? GradeName { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<UserResponseToTeacher>? Students { get; set; }
 
         public override string ToString()
