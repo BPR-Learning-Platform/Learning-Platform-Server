@@ -22,7 +22,7 @@ namespace Learning_Platform_Server.Tests
         private const string GradesUrl = "/grades";
 
         private const string TeacherId = "48";
-        private const string StudentId = "102";
+        private const string StudentId = "124";
         private const string NonexistentId = "9999";
 
         private readonly ITestOutputHelper _output;
@@ -104,9 +104,5 @@ namespace Learning_Platform_Server.Tests
             HttpResponseMessage? httpResponseMessage = await client.GetAsync(GradesUrl + "?teacherid=" + teacherId);
             return httpResponseMessage;
         }
-
-
-
-
     }
 }

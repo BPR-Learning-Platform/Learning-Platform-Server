@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Learning_Platform_Server.Models;
+using Newtonsoft.Json;
 using System.Runtime.Serialization;
 
 namespace Learning_Platform_Server.Entities
@@ -38,16 +39,16 @@ namespace Learning_Platform_Server.Entities
             set { _email = ("" + value).ToLower(); }
         }
         public string? Password { get; set; }
-        public float? Score { get; set; }
+        public MongoDbScore? Score { get; set; }
         public List<int>? assignedgradeids { get; set; } //changed to lowercase to make put user work with database //TODO ?
 
         public override string ToString()
         {
-            return "MongoDBUser: type: " + Type +
+            return "MongoDbUser: type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
                 ", password: " + Password +
-                ", score: " + Score +
+                ", " + Score +
                 ",\n\t" + "assignedGradeIds: \n\t" + (assignedgradeids is not null ? string.Join(",\n\t", assignedgradeids) : "");
 
         }

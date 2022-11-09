@@ -1,6 +1,7 @@
 ﻿using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetBatch(string userid, int correct, List<string> previousTaskIds);
+        List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds);
     }
 
     public class TaskService : ITaskService
@@ -30,7 +31,7 @@ namespace Learning_Platform_Server.Services
             _gradeService = gradeService;
         }
 
-        public List<TaskResponse> GetBatch(string userid, int correct, List<string> previousTaskIds)
+        public List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds)
         {
             UserResponse? userResponse = _userService.GetById(userid);
 
@@ -62,7 +63,7 @@ namespace Learning_Platform_Server.Services
             }
 
             // updating the users score asynchronously each time a new batch request is received
-            Task.Run(() => _userService.UpdateUserScore(userResponse, correct));
+            Task.Run(() => _userService.UpdateUserScore(userResponse, correctInfo));
 
             // for debugging
             //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed

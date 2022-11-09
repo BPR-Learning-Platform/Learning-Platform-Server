@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -25,8 +26,8 @@ namespace Learning_Platform_Server.Services
             _logger = logger;
         }
 
-        public float CalculateNewScore(float score, int correct)
-            => _userService.CalculateNewScore(score, correct);
+        public MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo)
+            => _userService.CalculateNewScore(multipleScore, correctInfo);
 
         public List<UserResponse> GetByGradeId(int gradeId)
             => _userService.GetByGradeId(gradeId);
@@ -46,15 +47,18 @@ namespace Learning_Platform_Server.Services
         public void Create(CreateUserRequest createUserRequest)
             => _userService.Create(createUserRequest);
 
-        public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
+        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
         {
-            float? previousScore = (float?)userResponse.Score;
+            if (userResponse.MultipleScore is null)
+                throw new Exception("MultipleScore was null");
+
+            MultipleScore previousScore = userResponse.MultipleScore;
 
             // calling service
-            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correct);
+            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correctInfo);
 
             UpdateCachedUser(updatedUserResponse);
-            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
+            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.MultipleScore);
 
             return updatedUserResponse;
         }
@@ -74,7 +78,7 @@ namespace Learning_Platform_Server.Services
                 if (userResponse is null)
                     throw new Exception("User id not found in cached UserList.");
 
-                userResponse.Score = updatedUserResponse.Score;
+                userResponse.MultipleScore = updatedUserResponse.MultipleScore;
             }
             else
                 throw new Exception("Cached UserList not found.");

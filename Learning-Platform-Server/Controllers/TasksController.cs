@@ -1,6 +1,6 @@
 ﻿using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Grades;
-using Learning_Platform_Server.Models.Score;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
@@ -41,7 +41,10 @@ namespace Learning_Platform_Server.Controllers
 
             Console.Write("Deserialized CorrectInfo: " + correctInfo);
 
-            List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, 100, previousTaskIds); //TODO remove hardcode
+            if (correctInfo is null)
+                throw new Exception("Could not read the query parameter named 'correct'");
+
+            List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, correctInfo, previousTaskIds); //TODO remove hardcode
 
             return Ok(taskResponseBatchList);
         }

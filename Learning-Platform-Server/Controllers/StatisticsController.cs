@@ -29,6 +29,9 @@ namespace Learning_Platform_Server.Controllers
             else if (gradeId is not null)
                 statisticResponseList = _statisticService.GetAllByGradeId(int.Parse(gradeId));
 
+            //For debugging
+            Console.WriteLine("This will be returned to frontend: " + string.Join(",\n\t", statisticResponseList));
+
             return Ok(statisticResponseList);
         }
     }

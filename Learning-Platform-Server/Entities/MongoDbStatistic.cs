@@ -7,6 +7,7 @@ namespace Learning_Platform_Server.Entities
     {
         [JsonProperty("_id")]
         public Id? Id { get; set; }
+        [JsonProperty("User")]
         public MongoDbStatistic? Statistic { get; set; }
         public UserId? UserId { get; set; }
         public TimeStamp? TimeStamp { get; set; }
@@ -31,12 +32,12 @@ namespace Learning_Platform_Server.Entities
     {
         [JsonProperty("AssignedGradeIDs")]
         public string? GradeId { get; set; }
-        public float? Score { get; set; }
+        public MongoDbScore? Score { get; set; }
 
         public override string ToString()
         {
             return "MongoDbStatistic: grade id: " + GradeId +
-                ", score: " + Score;
+                ", MongoDbScore: " + Score;
         }
     }
 }
