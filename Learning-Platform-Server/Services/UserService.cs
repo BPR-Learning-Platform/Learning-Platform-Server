@@ -75,6 +75,11 @@ namespace Learning_Platform_Server.Services
             //rounding the result
             newScore = (float)Math.Round((newScore), 2);
 
+            if (newScore < 0)
+                newScore = 0;
+            else if (newScore > 10)
+                newScore = 10;
+
             return newScore;
         }
     }
