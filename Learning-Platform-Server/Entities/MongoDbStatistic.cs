@@ -8,14 +8,9 @@ namespace Learning_Platform_Server.Entities
         [JsonProperty("_id")]
         public Id? Id { get; set; }
         public MongoDbStatistic? Statistic { get; set; }
+        public UserId? UserId { get; set; }
         public TimeStamp? TimeStamp { get; set; }
-        public override string ToString() => "MongoDbStatisticRoot: Oid: " + Id + ", " + Statistic;
-    }
-    public class StatisticId
-    {
-        [JsonProperty("$numberLong")]
-        public string? NumberLong { get; set; }
-        public override string ToString() => NumberLong + "";
+        public override string ToString() => "MongoDbStatisticRoot: Oid: " + Id + ", " + Statistic + ", UserId: " + UserId;
     }
 
     public class TimeStamp
@@ -34,14 +29,13 @@ namespace Learning_Platform_Server.Entities
 
     public class MongoDbStatistic
     {
-        public string? StudentId { get; set; }
+        [JsonProperty("AssignedGradeIDs")]
         public string? GradeId { get; set; }
         public float? Score { get; set; }
 
         public override string ToString()
         {
-            return "MongoDbStatistic: student id: " + StudentId +
-                ", grade id: " + GradeId +
+            return "MongoDbStatistic: grade id: " + GradeId +
                 ", score: " + Score;
         }
     }

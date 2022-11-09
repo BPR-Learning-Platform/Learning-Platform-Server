@@ -1,12 +1,16 @@
 ﻿using FluentAssertions;
+using Flurl.Http.Testing;
+using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Statistics;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +27,21 @@ namespace Learning_Platform_Server.Tests
     {
         private const string StatisticsUrl = "/statistics";
         private readonly ITestOutputHelper _output;
+        private readonly IConfiguration _configuration;
 
         public StatisticsControllerTests(ITestOutputHelper output)
         {
+            // More information on how this works: https://www.thecodebuzz.com/read-appsettings-json-in-net-core-test-project-xunit-mstest/
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false, false)
+                //.AddEnvironmentVariables()
+                .Build();
+
             _output = output;
         }
 
-        //[Fact]
+        [Fact]
         public async Task GetAllByStudentId_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             string studentId = "65";
@@ -52,8 +64,7 @@ namespace Learning_Platform_Server.Tests
                 TestStatisticList(statisticListWithAvgScores, true);
 
                 // Score: The average score should be correct
-                List<StatisticResponse>? statisticListForTheGrade = StatisticService.GetAllByParameter(null, gradeId);
-                EnsureCorrectAvgScoreCalculation(statisticListWithAvgScores, statisticListForTheGrade);
+                EnsureCorrectAvgScoreCalculation(statisticListWithAvgScores, gradeId);
             }
         }
 
@@ -114,8 +125,12 @@ namespace Learning_Platform_Server.Tests
             }
         }
 
-        private void EnsureCorrectAvgScoreCalculation(List<StatisticResponse> statisticListWithAvgScores, List<StatisticResponse> statisticList)
+        private void EnsureCorrectAvgScoreCalculation(List<StatisticResponse> statisticListWithAvgScores, int? gradeId)
         {
+            IHttpClientFactory? httpClientFactoryMock = GetHttpClientFactoryMock();
+            StatisticDAO? statisticDAO = new(httpClientFactoryMock);
+            List<StatisticResponse> statisticListForTheGrade = statisticDAO.GetAllByParameter(null, gradeId);
+
             foreach (StatisticResponse? statisticResponse in statisticListWithAvgScores)
             {
                 DateTime timeStampToCheck = statisticResponse.TimeStamp;
@@ -123,7 +138,7 @@ namespace Learning_Platform_Server.Tests
                 float? scoreToCheck = statisticResponse.Score;
 
                 float totalScoreFound = 0;
-                List<StatisticResponse>? statisticListToCheck = statisticList.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
+                List<StatisticResponse> statisticListToCheck = statisticListForTheGrade.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
                 _output.WriteLine("statisticListToCheck: " + string.Join(",", statisticListToCheck));
 
                 foreach (StatisticResponse? statisticToCheck in statisticListToCheck)
@@ -139,6 +154,22 @@ namespace Learning_Platform_Server.Tests
 
                 scoreToCheck.Should().BeApproximately(avgScoreFound, 0.001f);
             }
+        }
+
+        private IHttpClientFactory GetHttpClientFactoryMock()
+        {
+            IHttpClientFactory? httpClientFactoryMock = Substitute.For<IHttpClientFactory>();
+
+            string? mongoDbBaseUrl = _configuration.GetConnectionString("MongoDbBaseUrl");
+
+            HttpClient httpClient = new()
+            {
+                BaseAddress = new Uri(mongoDbBaseUrl)
+            };
+
+            httpClientFactoryMock.CreateClient("MongoDB").Returns(httpClient);
+
+            return httpClientFactoryMock;
         }
     }
 }

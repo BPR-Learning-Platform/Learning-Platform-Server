@@ -1,3 +1,4 @@
+using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Services;
 
@@ -18,12 +19,20 @@ services.AddMemoryCache();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+
 // configure DI for application services
-services.AddScoped<IUserService, UserService>();
+
+services.AddScoped<IUserDAO, UserDAO>();
+services.AddScoped<ITaskDAO, TaskDAO>();
+services.AddScoped<IGradeDAO, GradeDAO>();
+services.AddScoped<IStatisticDAO, StatisticDAO>();
+
+services.AddScoped<UserService>();
+services.AddScoped<IUserService, UserServiceWithCache>();
 services.AddScoped<ITaskService, TaskService>();
-services.AddScoped<IGradeService, GradeService>();
+services.AddScoped<GradeService>();
+services.AddScoped<IGradeService, GradeServiceWithCache>();
 services.AddScoped<IStatisticService, StatisticService>();
-services.AddScoped<ICacheHandler, CacheHandler>();
 
 services.AddCors(options =>
 {
@@ -35,6 +44,14 @@ services.AddCors(options =>
                     .AllowAnyHeader();
         });
 });
+
+string? mongoDbBaseUrl = builder.Configuration.GetConnectionString("MongoDbBaseUrl");
+
+services.AddHttpClient("MongoDB", options =>
+{
+    options.BaseAddress = new Uri(mongoDbBaseUrl);
+});
+
 
 var app = builder.Build();
 

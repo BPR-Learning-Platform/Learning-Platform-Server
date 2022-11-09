@@ -7,7 +7,13 @@ namespace Learning_Platform_Server.Models.Users
         public string? UserId { get; set; }
         public string? Type { get; set; }
         public string? Name { get; set; }
-        public string? Email { get; set; }
+
+        private string? _email;
+        public string? Email
+        {
+            get { return _email; }
+            set { _email = ("" + value).ToLower(); }
+        }
         public float? Score { get; set; }
         public List<int>? AssignedGradeIds { get; set; }
 

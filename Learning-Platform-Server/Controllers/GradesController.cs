@@ -24,7 +24,7 @@ namespace Learning_Platform_Server.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<StatisticResponse>> GetAllToTeacher([FromQuery] string teacherid)
         {
-            List<GradeResponseToTeacher>? gradeResponsesToTeacher = _gradeService.GetAllToTeacher(teacherid);
+            List<GradeResponseToTeacher> gradeResponsesToTeacher = _gradeService.GetAllToTeacher(teacherid);
             return Ok(gradeResponsesToTeacher);
         }
     }

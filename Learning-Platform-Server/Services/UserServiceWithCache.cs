@@ -1,48 +1,67 @@
-﻿using Learning_Platform_Server.Models.Grades;
+﻿using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Users;
-using Learning_Platform_Server.Services;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Learning_Platform_Server.Helpers
+namespace Learning_Platform_Server.Services
 {
-    public interface ICacheHandler
+    public class UserServiceWithCache : IUserService
     {
-        // USERS
-        void UpdateCachedUser(UserResponse updatedUserResponse);
-        UserResponse GetUserResponseFromCache(string userId);
-        void EnsureCaching(UserResponse userResponse);
-
-        // GRADES
-        int GetStep(string userid);
-    }
-
-    public class CacheHandler : ICacheHandler
-    {
+        private readonly UserService _userService;
         private readonly IMemoryCache _cache;
-        private readonly IUserService _userService;
-        private readonly IGradeService _gradeService;
-        private readonly ILogger<CacheHandler> _logger;
-
         public const string UserListCacheKey = "userList";
-        public const string GradeListCacheKey = "gradeList";
 
         public readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(60))
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(3600))
-                .SetPriority(CacheItemPriority.Normal)
-                .SetSize(1024);
+        .SetSlidingExpiration(TimeSpan.FromMinutes(60))
+        .SetAbsoluteExpiration(TimeSpan.FromMinutes(3600))
+        .SetPriority(CacheItemPriority.Normal)
+        .SetSize(1024);
 
-        public CacheHandler(IUserService userService, IGradeService gradeService, IMemoryCache cache, ILogger<CacheHandler> logger)
+        private readonly ILogger<UserServiceWithCache> _logger;
+
+        public UserServiceWithCache(UserService userService, IMemoryCache cache, ILogger<UserServiceWithCache> logger)
         {
             _userService = userService;
-            _gradeService = gradeService;
             _cache = cache;
             _logger = logger;
         }
 
+        public float CalculateNewScore(float score, int correct)
+            => _userService.CalculateNewScore(score, correct);
+
+        public List<UserResponse> GetByGradeId(int gradeId)
+            => _userService.GetByGradeId(gradeId);
+
+        public UserResponse? GetById(string id)
+            => _userService.GetById(id);
+
+        public UserResponse SignInUser(SignInRequest signInRequest)
+        {
+            UserResponse userResponse = _userService.SignInUser(signInRequest);
+
+            EnsureCaching(userResponse);
+
+            return userResponse;
+        }
+
+        public void Create(CreateUserRequest createUserRequest)
+            => _userService.Create(createUserRequest);
+
+        public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
+        {
+            float? previousScore = (float?)userResponse.Score;
+
+            // calling service
+            UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correct);
+
+            UpdateCachedUser(updatedUserResponse);
+            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
+
+            return updatedUserResponse;
+        }
 
 
-        // USERS
+
+        // helper methods
 
         public void UpdateCachedUser(UserResponse updatedUserResponse)
         {
@@ -133,61 +152,6 @@ namespace Learning_Platform_Server.Helpers
         {
             users = _cache.Set(UserListCacheKey, users, CacheEntryOptions);
             users.ToList().ForEach(x => Console.WriteLine(x));
-        }
-
-
-
-        // GRADES
-
-        private List<GradeResponse> GetGradeResponseListFromCache()
-        {
-            List<GradeResponse>? gradeResponseList;
-
-            if (_cache.TryGetValue(GradeListCacheKey, out IEnumerable<GradeResponse> grades))
-            {
-                _logger.Log(LogLevel.Information, "Cached GradeList found.");
-                gradeResponseList = grades.ToList();
-            }
-            else
-            {
-                _logger.Log(LogLevel.Information, "Cached GradeList not found. Calling GradeService and resetting cache.");
-
-                gradeResponseList = _gradeService.GetAll();
-                if (gradeResponseList is null)
-                    throw new Exception("Could not find grade list");
-
-                ResetCachedGradeList(gradeResponseList);
-            }
-
-            return gradeResponseList;
-        }
-
-        private void ResetCachedGradeList(List<GradeResponse> gradeResponseList)
-        {
-            Console.WriteLine("Resetting cached GradeList");
-            List<GradeResponse>? newGradeResponseList = _cache.Set(GradeListCacheKey, gradeResponseList, CacheEntryOptions);
-            newGradeResponseList.ForEach(x => Console.WriteLine(x));
-        }
-
-        public int GetStep(string userid)
-        {
-            UserResponse userResponse = GetUserResponseFromCache(userid);
-
-            if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
-                throw new Exception("No assignedgradeids were found for user with userid " + userid);
-
-            List<GradeResponse> gradeResponseList = GetGradeResponseListFromCache();
-
-            int assignedGradeId = userResponse.AssignedGradeIds[0];
-
-            GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
-            if (gradeResponse is null)
-                throw new Exception("No grade was found for gradeid " + assignedGradeId);
-
-            if (gradeResponse.Step is null)
-                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
-
-            return (int)gradeResponse.Step;
         }
     }
 }

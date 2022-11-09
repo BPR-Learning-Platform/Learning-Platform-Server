@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
@@ -17,7 +18,8 @@ namespace Learning_Platform_Server.Tests
 {
     public class UsersControllerTests
     {
-        public const string SignInUrl = "/users/signin";
+        public const string Url = "/users";
+        public const string SignInUrl = $"{Url}/signin";
         private readonly ITestOutputHelper _output;
 
         public UsersControllerTests(ITestOutputHelper output)
@@ -66,6 +68,47 @@ namespace Learning_Platform_Server.Tests
             HttpResponseMessage? responseMsg = await client.PostAsync(SignInUrl, content);
 
             responseMsg.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        }
+
+
+        // CREATE 
+
+        [Fact]
+        public async Task Create_new_user_receives_200_Ok_and_create_same_user_again_receives_403_forbidden()
+        {
+            string email = GetRandomString() + "@integrationtest.com";
+
+            HttpResponseMessage responseMsg = await CreateUserAsync(email);
+            responseMsg.StatusCode.Should().Be(HttpStatusCode.Created);
+
+            responseMsg = await CreateUserAsync(email);
+            responseMsg.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        }
+
+        // helper methods
+
+        private async Task<HttpResponseMessage> CreateUserAsync(string email)
+        {
+            string randomString = GetRandomString();
+
+            await using var application = new WebApplicationFactory<Program>();
+            using var client = application.CreateClient();
+
+            JsonContent content = JsonContent.Create(new CreateUserRequest() { Email = email, AssignedGradeIds = new() { 2 }, Name = randomString, Password = "integrationtestpassword", Type = "S" });
+
+            HttpResponseMessage? responseMsg = await client.PostAsync(Url, content);
+
+            _output.WriteLine("Statuscode:" + responseMsg.StatusCode);
+            _output.WriteLine(content.ReadAsStringAsync().Result);
+
+            return responseMsg;
+        }
+
+        private static string GetRandomString()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, 5)
+                        .Select(s => s[new Random().Next(s.Length)]).ToArray());
         }
     }
 }

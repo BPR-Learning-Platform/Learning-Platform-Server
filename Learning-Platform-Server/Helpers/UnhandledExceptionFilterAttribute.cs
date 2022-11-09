@@ -25,6 +25,8 @@ namespace Learning_Platform_Server.Helpers
                 statusCode = 404;
             else if (context.Exception is BadHttpRequestException)
                 statusCode = 400;
+            else if (context.Exception is ArgumentException)
+                statusCode = 403;
 
             var result = new ObjectResult(new
             {
