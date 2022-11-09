@@ -63,8 +63,9 @@ namespace Learning_Platform_Server.Tests
         private async Task BatchTest(HttpClient client)
         {
             string userId = "51";
+            string correct = "{%22A%22:{%22count%22:11,%22percentage%22:10},%22M%22:{%22count%22:12,%22percentage%22:9},%22S%22:{%22count%22:13,%22percentage%22:8},%22D%22:{%22count%22:14,%22percentage%22:7}}";
 
-            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + 100 + "&taskids=42,12,18");
+            HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + correct + "&taskids=42,12,18");
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
             string? responseContentString = httpResponseMessage.Content.ReadAsStringAsync().Result;
