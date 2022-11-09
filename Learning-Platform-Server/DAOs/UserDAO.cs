@@ -1,11 +1,13 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.Net;
 using System.Text;
 
@@ -208,25 +210,57 @@ namespace Learning_Platform_Server.DAOs
             if (mongoDbUserRoot.UserId is null)
                 throw new NullReferenceException("UserId was not found in mongoDbUserRoot");
 
+            if (mongoDbUserRoot.User.Score is null)
+                throw new NullReferenceException("Score was not found in mongoDbUserRoot");
+
             return new UserResponse()
             {
                 UserId = mongoDbUserRoot.UserId.NumberLong,
                 Type = mongoDbUserRoot.User.Type,
                 Name = mongoDbUserRoot.User.Name,
                 Email = mongoDbUserRoot.User.Email,
-                Score = mongoDbUserRoot.User.Score,
+                MultipleScore = MapToMultipleScore(mongoDbUserRoot.User.Score),
                 AssignedGradeIds = mongoDbUserRoot.User.assignedgradeids
             };
         }
+
+        public static MultipleScore MapToMultipleScore(MongoDbScore mongoDbScore)
+        {
+            return new MultipleScore()
+            {
+                A = parseStringToFloat(mongoDbScore.A),
+                S = parseStringToFloat(mongoDbScore.S),
+                M = parseStringToFloat(mongoDbScore.M),
+                D = parseStringToFloat(mongoDbScore.D),
+            };
+
+            static float? parseStringToFloat(string? str)
+                => str is not null ? float.Parse(str, CultureInfo.InvariantCulture) : null;
+        }
+
         private static MongoDbUser MapToMongoDbUser(UserResponse userResponse)
         {
+            if (userResponse.MultipleScore is null)
+                throw new NullReferenceException("userResponse.MultipleScore was null");
+
             return new MongoDbUser()
             {
                 Type = userResponse.Type,
                 Name = userResponse.Name,
                 Email = userResponse.Email,
-                Score = userResponse.Score,
+                Score = MapToMongoDbScore(userResponse.MultipleScore),
                 assignedgradeids = userResponse.AssignedGradeIds
+            };
+        }
+
+        private static MongoDbScore MapToMongoDbScore(MultipleScore multipleScore)
+        {
+            return new MongoDbScore()
+            {
+                A = multipleScore.A + "",
+                S = multipleScore.S + "",
+                M = multipleScore.M + "",
+                D = multipleScore.D + "",
             };
         }
 
@@ -238,7 +272,7 @@ namespace Learning_Platform_Server.DAOs
                 Name = createUserRequest.Name,
                 Email = createUserRequest.Email,
                 Password = createUserRequest.Password,
-                Score = 0,
+                Score = new MongoDbScore() { A = "1", M = "1", D = "1", S = "1" },
                 assignedgradeids = createUserRequest.AssignedGradeIds
             };
         }

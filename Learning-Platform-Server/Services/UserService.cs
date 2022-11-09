@@ -1,6 +1,7 @@
 ﻿using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -18,8 +19,8 @@ namespace Learning_Platform_Server.Services
         UserResponse? GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
         void Create(CreateUserRequest createUserRequest);
-        UserResponse UpdateUserScore(UserResponse userResponse, int correct);
-        float CalculateNewScore(float score, int correct);
+        UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo);
+        MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo);
     }
 
     public class UserService : IUserService
@@ -43,12 +44,12 @@ namespace Learning_Platform_Server.Services
         public void Create(CreateUserRequest createUserRequest)
             => _userDAO.Create(createUserRequest);
 
-        public UserResponse UpdateUserScore(UserResponse userResponse, int correct)
+        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
         {
-            if (userResponse.Score is null)
+            if (userResponse.MultipleScore is null)
                 throw new NullReferenceException("No score was found for the user: " + userResponse);
 
-            userResponse.Score = CalculateNewScore((float)userResponse.Score, correct);
+            userResponse.MultipleScore = CalculateNewScore(userResponse.MultipleScore, correctInfo); //TODO Calculate new score
 
             // calling DAO
             _userDAO.UpdateUser(userResponse);
@@ -60,8 +61,11 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        public float CalculateNewScore(float score, int correct)
+        public MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo)
         {
+            int correct = 100; //TODO remove hardcode
+            int score = 5;  //TODO remove hardcode
+
             float correctNumber = 0;
             if (correct > 0)
                 correctNumber = correct / 100 * Util.BatchSize;
@@ -75,12 +79,21 @@ namespace Learning_Platform_Server.Services
             //rounding the result
             newScore = (float)Math.Round((newScore), 2);
 
-            if (newScore < 0)
-                newScore = 0;
-            else if (newScore > 10)
-                newScore = 10;
+            if (newScore < Util.MinimumScore)
+                newScore = Util.MinimumScore;
+            else if (newScore > Util.MaximumScore)
+                newScore = Util.MinimumScore;
 
-            return newScore;
+            //return newScore;
+            return new MultipleScore() { A = GetRandomFloat(), M = GetRandomFloat(), S = GetRandomFloat(), D = GetRandomFloat() }; // TODO Remove dummy data
+        }
+
+        static float GetRandomFloat()
+        {
+            System.Random random = new();
+            double val = (random.NextDouble() * (3 - 1) + 1);
+            float randomFloat = (float)val;
+            return (float)Math.Round((randomFloat), 1);
         }
     }
 }

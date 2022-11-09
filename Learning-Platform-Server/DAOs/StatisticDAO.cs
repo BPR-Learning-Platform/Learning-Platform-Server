@@ -89,6 +89,12 @@ namespace Learning_Platform_Server.DAOs
                 return null;
             }
 
+            if (mongoDbStatisticRoot.Statistic.Score is null)
+            {
+                Console.WriteLine("Score was not found in mongoDbStatisticRoot.Statistic");
+                return null;
+            }
+
             if (mongoDbStatisticRoot.UserId is null)
             {
                 Console.WriteLine("UserId was not found in mongoDbStatisticRoot");
@@ -114,7 +120,7 @@ namespace Learning_Platform_Server.DAOs
             {
                 StudentId = mongoDbStatisticRoot.UserId.NumberLong,
                 GradeId = mongoDbStatisticRoot.Statistic.GradeId,
-                Score = mongoDbStatisticRoot.Statistic.Score,
+                MultipleScore = UserDAO.MapToMultipleScore(mongoDbStatisticRoot.Statistic.Score),
                 TimeStamp = MongoDbHelper.MapToDateTime(date)
             };
         }

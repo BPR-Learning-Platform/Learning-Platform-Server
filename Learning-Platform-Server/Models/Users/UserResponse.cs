@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.Entities;
+using Learning_Platform_Server.Models.Scores;
 
 namespace Learning_Platform_Server.Models.Users
 {
@@ -14,7 +15,7 @@ namespace Learning_Platform_Server.Models.Users
             get { return _email; }
             set { _email = ("" + value).ToLower(); }
         }
-        public float? Score { get; set; }
+        public MultipleScore? MultipleScore { get; set; }
         public List<int>? AssignedGradeIds { get; set; }
 
         public override string ToString()
@@ -23,7 +24,7 @@ namespace Learning_Platform_Server.Models.Users
                 ", type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
-                ", score: " + Score +
+                ", " + MultipleScore +
                 ",\n\t" + "assignedGradeIds: \n\t" + (AssignedGradeIds is not null ? string.Join(",\n\t", AssignedGradeIds) : "");
         }
     }
