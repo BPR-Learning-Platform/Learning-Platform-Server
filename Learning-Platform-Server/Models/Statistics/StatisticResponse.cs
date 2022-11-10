@@ -9,14 +9,14 @@ namespace Learning_Platform_Server.Models.Statistics
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? StudentId { get; set; }
         public string? GradeId { get; set; }
-        public MultipleScore? MultipleScore { get; set; }
+        public ScoreResponse? Score { get; set; }
         public DateTime TimeStamp { get; set; }
 
         public override string ToString()
         {
             return "StatisticResponse: student id: " + StudentId +
                 ", grade id: " + GradeId +
-                ", " + MultipleScore +
+                ", " + Score +
                 ", timestamp: " + TimeStamp;
         }
     }

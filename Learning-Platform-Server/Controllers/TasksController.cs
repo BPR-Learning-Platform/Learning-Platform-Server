@@ -44,7 +44,7 @@ namespace Learning_Platform_Server.Controllers
             if (correctInfo is null)
                 throw new Exception("Could not read the query parameter named 'correct'");
 
-            List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, correctInfo, previousTaskIds); //TODO remove hardcode
+            List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, correctInfo, previousTaskIds);
 
             return Ok(taskResponseBatchList);
         }

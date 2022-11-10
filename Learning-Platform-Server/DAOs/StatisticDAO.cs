@@ -120,7 +120,7 @@ namespace Learning_Platform_Server.DAOs
             {
                 StudentId = mongoDbStatisticRoot.UserId.NumberLong,
                 GradeId = mongoDbStatisticRoot.Statistic.GradeId,
-                MultipleScore = UserDAO.MapToMultipleScore(mongoDbStatisticRoot.Statistic.Score),
+                Score = UserDAO.MapToScoreResponse(mongoDbStatisticRoot.Statistic.Score),
                 TimeStamp = MongoDbHelper.MapToDateTime(date)
             };
         }
