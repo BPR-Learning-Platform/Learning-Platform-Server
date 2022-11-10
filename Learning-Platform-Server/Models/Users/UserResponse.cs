@@ -15,7 +15,7 @@ namespace Learning_Platform_Server.Models.Users
             get { return _email; }
             set { _email = ("" + value).ToLower(); }
         }
-        public MultipleScore? MultipleScore { get; set; }
+        public ScoreResponse? Score { get; set; }
         public List<int>? AssignedGradeIds { get; set; }
 
         public override string ToString()
@@ -24,7 +24,7 @@ namespace Learning_Platform_Server.Models.Users
                 ", type: " + Type +
                 ", name: " + Name +
                 ", email: " + Email +
-                ", " + MultipleScore +
+                ", " + Score +
                 ",\n\t" + "assignedGradeIds: \n\t" + (AssignedGradeIds is not null ? string.Join(",\n\t", AssignedGradeIds) : "");
         }
     }

@@ -26,8 +26,8 @@ namespace Learning_Platform_Server.Services
             _logger = logger;
         }
 
-        public MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo)
-            => _userService.CalculateNewScore(multipleScore, correctInfo);
+        public ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo)
+            => _userService.CalculateNewScore(score, correctInfo);
 
         public List<UserResponse> GetByGradeId(int gradeId)
             => _userService.GetByGradeId(gradeId);
@@ -49,16 +49,16 @@ namespace Learning_Platform_Server.Services
 
         public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
         {
-            if (userResponse.MultipleScore is null)
-                throw new Exception("MultipleScore was null");
+            if (userResponse.Score is null)
+                throw new Exception("Score was null");
 
-            MultipleScore previousScore = userResponse.MultipleScore;
+            ScoreResponse previousScore = userResponse.Score;
 
             // calling service
             UserResponse updatedUserResponse = _userService.UpdateUserScore(userResponse, correctInfo);
 
             UpdateCachedUser(updatedUserResponse);
-            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.MultipleScore);
+            Console.WriteLine("The cached user with id " + userResponse.UserId + " was updated from " + previousScore + " to " + updatedUserResponse.Score);
 
             return updatedUserResponse;
         }
@@ -78,7 +78,7 @@ namespace Learning_Platform_Server.Services
                 if (userResponse is null)
                     throw new Exception("User id not found in cached UserList.");
 
-                userResponse.MultipleScore = updatedUserResponse.MultipleScore;
+                userResponse.Score = updatedUserResponse.Score;
             }
             else
                 throw new Exception("Cached UserList not found.");

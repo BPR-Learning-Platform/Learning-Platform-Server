@@ -111,13 +111,13 @@ namespace Learning_Platform_Server.Tests
                 statisticResponse.TimeStamp.Should().BeAfter(new DateTime(2022, 01, 01));
 
                 // Score
-                statisticResponse.MultipleScore.Should().NotBeNull();
-                if (statisticResponse.MultipleScore is not null)
+                statisticResponse.Score.Should().NotBeNull();
+                if (statisticResponse.Score is not null)
                 {
-                    TestScore(statisticResponse.MultipleScore.A);
-                    TestScore(statisticResponse.MultipleScore.M);
-                    TestScore(statisticResponse.MultipleScore.S);
-                    TestScore(statisticResponse.MultipleScore.D);
+                    TestScore(statisticResponse.Score.A);
+                    TestScore(statisticResponse.Score.M);
+                    TestScore(statisticResponse.Score.S);
+                    TestScore(statisticResponse.Score.D);
                 }
 
 
@@ -143,7 +143,7 @@ namespace Learning_Platform_Server.Tests
              {
                  DateTime timeStampToCheck = statisticResponse.TimeStamp;
                  string? gradeIdToCheck = statisticResponse.GradeId;
-                 float? scoreToCheck = statisticResponse.MultipleScore;
+                 float? scoreToCheck = statisticResponse.Score;
 
                  float totalScoreFound = 0;
                  List<StatisticResponse> statisticListToCheck = statisticListForTheGrade.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
@@ -151,8 +151,8 @@ namespace Learning_Platform_Server.Tests
 
                  foreach (StatisticResponse? statisticToCheck in statisticListToCheck)
                  {
-                     if (statisticToCheck.MultipleScore is not null)
-                         totalScoreFound += (float)statisticToCheck.MultipleScore;
+                     if (statisticToCheck.Score is not null)
+                         totalScoreFound += (float)statisticToCheck.Score;
                  }
 
                  float avgScoreFound = totalScoreFound / statisticListToCheck.Count;

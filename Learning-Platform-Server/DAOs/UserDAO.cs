@@ -219,14 +219,14 @@ namespace Learning_Platform_Server.DAOs
                 Type = mongoDbUserRoot.User.Type,
                 Name = mongoDbUserRoot.User.Name,
                 Email = mongoDbUserRoot.User.Email,
-                MultipleScore = MapToMultipleScore(mongoDbUserRoot.User.Score),
+                Score = MapToScoreResponse(mongoDbUserRoot.User.Score),
                 AssignedGradeIds = mongoDbUserRoot.User.assignedgradeids
             };
         }
 
-        public static MultipleScore MapToMultipleScore(MongoDbScore mongoDbScore)
+        public static ScoreResponse MapToScoreResponse(MongoDbScore mongoDbScore)
         {
-            return new MultipleScore()
+            return new ScoreResponse()
             {
                 A = parseStringToFloat(mongoDbScore.A),
                 S = parseStringToFloat(mongoDbScore.S),
@@ -240,27 +240,27 @@ namespace Learning_Platform_Server.DAOs
 
         private static MongoDbUser MapToMongoDbUser(UserResponse userResponse)
         {
-            if (userResponse.MultipleScore is null)
-                throw new NullReferenceException("userResponse.MultipleScore was null");
+            if (userResponse.Score is null)
+                throw new NullReferenceException("Score was not found in userResponse");
 
             return new MongoDbUser()
             {
                 Type = userResponse.Type,
                 Name = userResponse.Name,
                 Email = userResponse.Email,
-                Score = MapToMongoDbScore(userResponse.MultipleScore),
+                Score = MapToMongoDbScore(userResponse.Score),
                 assignedgradeids = userResponse.AssignedGradeIds
             };
         }
 
-        private static MongoDbScore MapToMongoDbScore(MultipleScore multipleScore)
+        private static MongoDbScore MapToMongoDbScore(ScoreResponse score)
         {
             return new MongoDbScore()
             {
-                A = multipleScore.A + "",
-                S = multipleScore.S + "",
-                M = multipleScore.M + "",
-                D = multipleScore.D + "",
+                A = score.A + "",
+                S = score.S + "",
+                M = score.M + "",
+                D = score.D + "",
             };
         }
 

@@ -20,7 +20,7 @@ namespace Learning_Platform_Server.Services
         List<UserResponse> GetByGradeId(int gradeId);
         void Create(CreateUserRequest createUserRequest);
         UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo);
-        MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo);
+        ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo);
     }
 
     public class UserService : IUserService
@@ -46,10 +46,10 @@ namespace Learning_Platform_Server.Services
 
         public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
         {
-            if (userResponse.MultipleScore is null)
+            if (userResponse.Score is null)
                 throw new NullReferenceException("No score was found for the user: " + userResponse);
 
-            userResponse.MultipleScore = CalculateNewScore(userResponse.MultipleScore, correctInfo); //TODO Calculate new score
+            userResponse.Score = CalculateNewScore(userResponse.Score, correctInfo);
 
             // calling DAO
             _userDAO.UpdateUser(userResponse);
@@ -61,31 +61,30 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        public MultipleScore CalculateNewScore(MultipleScore multipleScore, CorrectInfo? correctInfo)
+        public ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo) //TODO Calculate new score
         {
-            int correct = 100; //TODO remove hardcode
-            int score = 5;  //TODO remove hardcode
+            /* int correct = 100;
+             int score = 3; 
 
-            float correctNumber = 0;
-            if (correct > 0)
-                correctNumber = correct / 100 * Util.BatchSize;
+             float correctNumber = 0;
+             if (correct > 0)
+                 correctNumber = correct / 100 * Util.BatchSize;
 
-            float incorrectNumber = Util.BatchSize - correctNumber;
+             float incorrectNumber = Util.BatchSize - correctNumber;
 
-            // increase/decrease score with 0.1 points for each correct/incorrect answer
-            float change = (correctNumber - incorrectNumber) / 10;
-            float newScore = score + change;
+             // increase/decrease score with 0.1 points for each correct/incorrect answer
+             float change = (correctNumber - incorrectNumber) / 10;
+             float newScore = score + change;
 
-            //rounding the result
-            newScore = (float)Math.Round((newScore), 2);
+             //rounding the result
+             newScore = (float)Math.Round((newScore), 2);
 
-            if (newScore < Util.MinimumScore)
-                newScore = Util.MinimumScore;
-            else if (newScore > Util.MaximumScore)
-                newScore = Util.MinimumScore;
+             if (newScore < Util.MinimumScore)
+                 newScore = Util.MinimumScore;
+             else if (newScore > Util.MaximumScore)
+                 newScore = Util.MinimumScore; */
 
-            //return newScore;
-            return new MultipleScore() { A = GetRandomFloat(), M = GetRandomFloat(), S = GetRandomFloat(), D = GetRandomFloat() }; // TODO Remove dummy data
+            return new ScoreResponse() { A = GetRandomFloat(), M = GetRandomFloat(), S = GetRandomFloat(), D = GetRandomFloat() }; // TODO Remove dummy data
         }
 
         static float GetRandomFloat()

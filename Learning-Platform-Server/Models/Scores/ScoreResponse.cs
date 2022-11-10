@@ -2,7 +2,7 @@
 
 namespace Learning_Platform_Server.Models.Scores
 {
-    public class MultipleScore
+    public class ScoreResponse
     {
         public float? A { get; set; }
         public float? M { get; set; }
@@ -10,7 +10,7 @@ namespace Learning_Platform_Server.Models.Scores
         public float? D { get; set; }
         public override string ToString()
         {
-            return "MultipleScore: A: " + A +
+            return "ScoreResponse: A: " + A +
                 ", M: " + M +
                 ", S: " + S +
                 ", D: " + D;
