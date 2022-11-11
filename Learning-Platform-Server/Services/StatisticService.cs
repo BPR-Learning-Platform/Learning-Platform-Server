@@ -26,6 +26,17 @@ namespace Learning_Platform_Server.Services
         {
             List<StatisticResponse>? statisticListForTheGrade = _statisticDAO.GetAllByParameter(null, gradeId);
 
+            List<StatisticResponse> statisticListWithAvgScores = GetAvg(statisticListForTheGrade);
+
+            return statisticListWithAvgScores;
+        }
+
+
+
+        // helper methods
+
+        public static List<StatisticResponse> GetAvg(List<StatisticResponse> statisticListForTheGrade)
+        {
             // Group by TimeStamp Date and calculate the average Score for each group
             List<StatisticResponse> statisticListWithAvgScores = statisticListForTheGrade.GroupBy(
                 statisticResponse => statisticResponse.TimeStamp.Date,

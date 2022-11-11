@@ -25,9 +25,6 @@ namespace Learning_Platform_Server.Services
             _logger = logger;
         }
 
-        public ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo)
-            => _userService.CalculateNewScore(score, correctInfo);
-
         public List<UserResponse> GetByGradeId(int gradeId)
             => _userService.GetByGradeId(gradeId);
 
@@ -46,7 +43,7 @@ namespace Learning_Platform_Server.Services
         public void Create(CreateUserRequest createUserRequest)
             => _userService.Create(createUserRequest);
 
-        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
+        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo)
         {
             if (userResponse.Score is null)
                 throw new Exception("Score was null");

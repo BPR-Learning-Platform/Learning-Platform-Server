@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds);
+        List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds);
     }
 
     public class TaskService : ITaskService
@@ -24,7 +24,7 @@ namespace Learning_Platform_Server.Services
             _gradeService = gradeService;
         }
 
-        public List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds)
+        public List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds)
         {
             UserResponse? userResponse = _userService.GetById(userid);
 

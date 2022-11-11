@@ -1,9 +1,7 @@
 ﻿using FluentAssertions;
 using Learning_Platform_Server.Models.Statistics;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using NSubstitute;
 using System.Net;
 using Xunit.Abstractions;
 
@@ -13,20 +11,12 @@ namespace Learning_Platform_Server.Tests
     {
         private const string StatisticsUrl = "/statistics";
         private readonly ITestOutputHelper _output;
-        private readonly IConfiguration _configuration;
 
         private const float MinimumScore = 1.0f;
         private const float MaximumScore = 3.9f;
 
         public StatisticsControllerTests(ITestOutputHelper output)
         {
-            // More information on how this works: https://www.thecodebuzz.com/read-appsettings-json-in-net-core-test-project-xunit-mstest/
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, false)
-                //.AddEnvironmentVariables()
-                .Build();
-
             _output = output;
         }
 
@@ -42,7 +32,7 @@ namespace Learning_Platform_Server.Tests
         }
 
         [Fact]
-        public async Task GetAllByGradeId_receives_200_OK_with_multiple_objects_of_expected_type_and_correct_average_scores()
+        public async Task GetAllByGradeId_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             int gradeId = 2;
             List<StatisticResponse>? statisticListWithAvgScores = await GetStatisticResponseListAsync("?gradeid=" + gradeId);
@@ -51,9 +41,6 @@ namespace Learning_Platform_Server.Tests
             if (statisticListWithAvgScores is not null)
             {
                 TestStatisticList(statisticListWithAvgScores, true);
-
-                // Score: The average score should be correct
-                EnsureCorrectAvgScoreCalculation(statisticListWithAvgScores, gradeId);
             }
         }
 
@@ -117,53 +104,6 @@ namespace Learning_Platform_Server.Tests
             }
 
             void TestScore(float? score) => score.Should().BeGreaterOrEqualTo(MinimumScore);
-        }
-
-        private void EnsureCorrectAvgScoreCalculation(List<StatisticResponse> statisticListWithAvgScores, int? gradeId) //TODO: Redo and reactivate
-        {
-            /* IHttpClientFactory? httpClientFactoryMock = GetHttpClientFactoryMock();
-             StatisticDAO? statisticDAO = new(httpClientFactoryMock);
-             List<StatisticResponse> statisticListForTheGrade = statisticDAO.GetAllByParameter(null, gradeId);
-
-             foreach (StatisticResponse? statisticResponse in statisticListWithAvgScores)
-             {
-                 DateTime timeStampToCheck = statisticResponse.TimeStamp;
-                 string? gradeIdToCheck = statisticResponse.GradeId;
-                 float? scoreToCheck = statisticResponse.Score;
-
-                 float totalScoreFound = 0;
-                 List<StatisticResponse> statisticListToCheck = statisticListForTheGrade.Where(x => x.GradeId is not null && x.GradeId.Equals(gradeIdToCheck) && x.TimeStamp.Date.Equals(timeStampToCheck.Date)).ToList();
-                 _output.WriteLine("statisticListToCheck: " + string.Join(",", statisticListToCheck));
-
-                 foreach (StatisticResponse? statisticToCheck in statisticListToCheck)
-                 {
-                     if (statisticToCheck.Score is not null)
-                         totalScoreFound += (float)statisticToCheck.Score;
-                 }
-
-                 float avgScoreFound = totalScoreFound / statisticListToCheck.Count;
-
-                 _output.WriteLine("expected avg score: " + scoreToCheck);
-                 _output.WriteLine("found avg score: " + avgScoreFound);
-
-                 scoreToCheck.Should().BeApproximately(avgScoreFound, 0.001f);
-             } */
-        }
-
-        private IHttpClientFactory GetHttpClientFactoryMock()
-        {
-            IHttpClientFactory? httpClientFactoryMock = Substitute.For<IHttpClientFactory>();
-
-            string? mongoDbBaseUrl = _configuration.GetConnectionString("MongoDbBaseUrl");
-
-            HttpClient httpClient = new()
-            {
-                BaseAddress = new Uri(mongoDbBaseUrl)
-            };
-
-            httpClientFactoryMock.CreateClient("MongoDB").Returns(httpClient);
-
-            return httpClientFactoryMock;
         }
     }
 }
