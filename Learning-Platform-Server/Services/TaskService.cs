@@ -1,15 +1,8 @@
 ﻿using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.Services
 {

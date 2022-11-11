@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Runtime.Serialization;
 
 namespace Learning_Platform_Server.Entities
 {

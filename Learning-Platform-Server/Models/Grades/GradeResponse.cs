@@ -1,5 +1,4 @@
-﻿using Learning_Platform_Server.Entities;
-using Learning_Platform_Server.Models.Users;
+﻿using Learning_Platform_Server.Models.Users;
 using System.Text.Json.Serialization;
 
 namespace Learning_Platform_Server.Models.Grades

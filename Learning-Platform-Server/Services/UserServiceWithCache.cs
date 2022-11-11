@@ -1,5 +1,4 @@
-﻿using Learning_Platform_Server.Helpers;
-using Learning_Platform_Server.Models.Scores;
+﻿using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.Extensions.Caching.Memory;
 

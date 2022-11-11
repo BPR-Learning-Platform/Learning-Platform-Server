@@ -1,6 +1,4 @@
-﻿using Learning_Platform_Server.Models;
-using Newtonsoft.Json;
-using System.Runtime.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Learning_Platform_Server.Entities
 {

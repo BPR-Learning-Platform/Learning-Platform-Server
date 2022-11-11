@@ -2,14 +2,10 @@
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.DAOs
 {

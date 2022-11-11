@@ -1,24 +1,10 @@
 ﻿using FluentAssertions;
-using Flurl.Http.Testing;
-using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Statistics;
-using Learning_Platform_Server.Models.Tasks;
-using Learning_Platform_Server.Services;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Learning_Platform_Server.Tests

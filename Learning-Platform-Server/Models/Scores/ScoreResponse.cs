@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Learning_Platform_Server.Models.Scores
+﻿namespace Learning_Platform_Server.Models.Scores
 {
     public class ScoreResponse
     {
