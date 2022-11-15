@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.Services
     public interface IUserService
     {
         UserResponse SignInUser(SignInRequest signInRequest);
-        UserResponse? GetById(string id);
+        UserResponse GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
         void Create(CreateUserRequest createUserRequest);
         UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo);
@@ -26,7 +26,7 @@ namespace Learning_Platform_Server.Services
         public UserResponse SignInUser(SignInRequest signInRequest)
             => _userDAO.SignInUser(signInRequest);
 
-        public UserResponse? GetById(string id)
+        public UserResponse GetById(string id)
             => _userDAO.GetById(id);
 
         public List<UserResponse> GetByGradeId(int gradeId)

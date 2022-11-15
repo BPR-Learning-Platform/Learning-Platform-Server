@@ -28,7 +28,7 @@ namespace Learning_Platform_Server.Services
         public List<UserResponse> GetByGradeId(int gradeId)
             => _userService.GetByGradeId(gradeId);
 
-        public UserResponse? GetById(string id)
+        public UserResponse GetById(string id)
             => _userService.GetById(id);
 
         public UserResponse SignInUser(SignInRequest signInRequest)
@@ -94,8 +94,6 @@ namespace Learning_Platform_Server.Services
                     _logger.Log(LogLevel.Information, "User id not found in cached UserList. Calling UserService and adding user to cache.");
 
                     userResponse = _userService.GetById(userId);
-                    if (userResponse is null)
-                        throw new KeyNotFoundException("Could not find user with id " + userId);
 
                     AddToCachedUserList(users, userResponse);
                 }
@@ -105,8 +103,6 @@ namespace Learning_Platform_Server.Services
                 _logger.Log(LogLevel.Information, "Cached UserList not found. Calling UserService and resetting cache.");
 
                 userResponse = _userService.GetById(userId);
-                if (userResponse is null)
-                    throw new KeyNotFoundException("Could not find user with id " + userId);
 
                 ResetCachedUserList(userResponse);
             }

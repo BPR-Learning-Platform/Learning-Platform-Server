@@ -26,10 +26,7 @@ namespace Learning_Platform_Server.Services
 
         public List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds)
         {
-            UserResponse? userResponse = _userService.GetById(userid);
-
-            if (userResponse is null)
-                throw new Exception("No user was found for userid " + userid);
+            UserResponse userResponse = _userService.GetById(userid);
 
             int step = _gradeService.GetStep(userResponse);
             List<TaskResponse> taskResponseList = _taskDAO.GetAll(step);

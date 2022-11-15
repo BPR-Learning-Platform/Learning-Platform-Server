@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.Services
     {
         List<GradeResponse> GetAll();
         List<GradeResponseToTeacher> GetAllToTeacher(string teacherId);
-        GradeResponse? GetById(int id);
+        GradeResponse GetById(int id);
         int GetStep(UserResponse userResponse);
     }
 
@@ -28,10 +28,7 @@ namespace Learning_Platform_Server.Services
 
         public List<GradeResponseToTeacher> GetAllToTeacher(string teacherId)
         {
-            UserResponse? teacher = _userService.GetById(teacherId);
-
-            if (teacher is null)
-                throw new KeyNotFoundException("Could not find teacher with id " + teacherId);
+            UserResponse teacher = _userService.GetById(teacherId);
 
             if (teacher.Type is null)
                 throw new NullReferenceException("No type was found for user with id " + teacherId + ", so could not determine if the user is really a teacher. Details: " + teacher);
@@ -57,7 +54,7 @@ namespace Learning_Platform_Server.Services
 
                 List<UserResponse> userResponseList = _userService.GetByGradeId(gradeId);
                 List<UserResponseToTeacher> studentsToTeacher = new();
-                foreach (UserResponse? user in userResponseList)
+                foreach (UserResponse user in userResponseList)
                 {
                     if (user.Type is null)
                     {
@@ -76,7 +73,7 @@ namespace Learning_Platform_Server.Services
             return gradeResponsesToTeacher;
         }
 
-        public GradeResponse? GetById(int id)
+        public GradeResponse GetById(int id)
             => _gradeDAO.GetById(id);
 
 
