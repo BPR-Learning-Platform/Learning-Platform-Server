@@ -7,7 +7,6 @@ namespace Learning_Platform_Server.Entities
     {
         [JsonProperty("_id")]
         public Id? Id { get; set; }
-        [JsonProperty("User")]
         public MongoDbStatistic? Statistic { get; set; }
         public UserId? UserId { get; set; }
         public TimeStamp? TimeStamp { get; set; }
