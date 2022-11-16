@@ -1,6 +1,4 @@
-﻿using Learning_Platform_Server.Entities;
-
-namespace Learning_Platform_Server.Models.Users
+﻿namespace Learning_Platform_Server.Models.Users
 {
     public class CreateUserRequest
     {

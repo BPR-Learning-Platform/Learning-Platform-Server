@@ -1,22 +1,15 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Grades;
-using Learning_Platform_Server.Models.Statistics;
-using Learning_Platform_Server.Models.Tasks;
-using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
 using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.DAOs
 {
     public interface IGradeDAO
     {
         List<GradeResponse> GetAll();
-        GradeResponse? GetById(int id);
+        GradeResponse GetById(int id);
     }
 
     public class GradeDAO : IGradeDAO
@@ -57,7 +50,7 @@ namespace Learning_Platform_Server.DAOs
             return gradeList;
         }
 
-        public GradeResponse? GetById(int id)
+        public GradeResponse GetById(int id)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?id=" + id);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
@@ -73,16 +66,16 @@ namespace Learning_Platform_Server.DAOs
 
                 MongoDbGradeRoot? mongoDbGradeRoot = MapToMongoDbGradeRoot(gradeRootBsonValue);
                 if (mongoDbGradeRoot is null)
-                {
-                    Console.WriteLine("GradeRoot was not found");
-                    return null;
-                }
+                    throw new NullReferenceException("GradeRoot was not found");
 
                 GradeResponse? gradeResponse = MapToGradeResponse(mongoDbGradeRoot);
+                if (gradeResponse is null)
+                    throw new NullReferenceException("GradeResponse was not found");
 
                 return gradeResponse;
             }
-            return null;
+
+            throw new KeyNotFoundException("Could not find any grade with id " + id);
         }
 
 

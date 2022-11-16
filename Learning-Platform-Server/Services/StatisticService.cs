@@ -1,17 +1,6 @@
 ﻿using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Entities;
-using Learning_Platform_Server.Helpers;
-using Learning_Platform_Server.Models;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Statistics;
-using Learning_Platform_Server.Models.Tasks;
-using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.Services
 {
@@ -37,6 +26,17 @@ namespace Learning_Platform_Server.Services
         {
             List<StatisticResponse>? statisticListForTheGrade = _statisticDAO.GetAllByParameter(null, gradeId);
 
+            List<StatisticResponse> statisticListWithAvgScores = GetAvg(statisticListForTheGrade);
+
+            return statisticListWithAvgScores;
+        }
+
+
+
+        // helper methods
+
+        public static List<StatisticResponse> GetAvg(List<StatisticResponse> statisticListForTheGrade)
+        {
             // Group by TimeStamp Date and calculate the average Score for each group
             List<StatisticResponse> statisticListWithAvgScores = statisticListForTheGrade.GroupBy(
                 statisticResponse => statisticResponse.TimeStamp.Date,

@@ -1,6 +1,4 @@
-﻿using Learning_Platform_Server.Entities;
-
-namespace Learning_Platform_Server.Models.Tasks
+﻿namespace Learning_Platform_Server.Models.Tasks
 {
     public class TaskResponse
     {

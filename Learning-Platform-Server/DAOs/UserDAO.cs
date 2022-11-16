@@ -2,21 +2,17 @@
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.DAOs
 {
     public interface IUserDAO
     {
         UserResponse SignInUser(SignInRequest signInRequest);
-        UserResponse? GetById(string id);
+        UserResponse GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
         void Create(CreateUserRequest createUserRequest);
         void UpdateUser(UserResponse userResponse);
@@ -54,7 +50,7 @@ namespace Learning_Platform_Server.DAOs
             return userResponse;
         }
 
-        public UserResponse? GetById(string id)
+        public UserResponse GetById(string id)
         {
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "user?userid=" + id);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
@@ -76,7 +72,7 @@ namespace Learning_Platform_Server.DAOs
 
                 return userResponse;
             }
-            return null;
+            throw new KeyNotFoundException("Could not find any user with id " + id);
         }
 
         public List<UserResponse> GetByGradeId(int gradeId)

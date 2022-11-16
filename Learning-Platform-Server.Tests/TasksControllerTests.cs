@@ -1,17 +1,9 @@
 ﻿using FluentAssertions;
 using Learning_Platform_Server.Models.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Learning_Platform_Server.Tests
@@ -62,8 +54,8 @@ namespace Learning_Platform_Server.Tests
 
         private async Task BatchTest(HttpClient client)
         {
-            string userId = "124";
-            string correct = "{%22A%22:{%22count%22:11,%22percentage%22:10},%22M%22:{%22count%22:12,%22percentage%22:9},%22S%22:{%22count%22:13,%22percentage%22:8},%22D%22:{%22count%22:14,%22percentage%22:7}}";
+            string userId = "144";
+            string correct = "{%22A%22:{%22count%22:2,%22percentage%22:50},%22M%22:{%22count%22:1,%22percentage%22:100},%22S%22:{%22count%22:0,%22percentage%22:100},%22D%22:{%22count%22:0,%22percentage%22:0}}";
 
             HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + correct + "&taskids=42,12,18");
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);

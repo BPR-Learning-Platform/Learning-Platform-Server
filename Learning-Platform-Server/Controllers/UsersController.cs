@@ -1,9 +1,6 @@
-﻿using Learning_Platform_Server.Helpers;
-using Learning_Platform_Server.Models.Users;
+﻿using Learning_Platform_Server.Models.Users;
 using Learning_Platform_Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using MongoDB.Bson;
 
 namespace Learning_Platform_Server.Controllers
 {

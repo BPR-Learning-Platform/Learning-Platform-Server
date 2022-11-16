@@ -41,9 +41,6 @@ namespace Learning_Platform_Server.Services
                 // calling service
                 gradeResponseList = _gradeService.GetAll();
 
-                if (gradeResponseList is null)
-                    throw new Exception("Could not find grade list");
-
                 ResetCachedGradeList(gradeResponseList);
             }
 
@@ -53,7 +50,7 @@ namespace Learning_Platform_Server.Services
         public List<GradeResponseToTeacher> GetAllToTeacher(string teacherId)
             => _gradeService.GetAllToTeacher(teacherId);
 
-        public GradeResponse? GetById(int id)
+        public GradeResponse GetById(int id)
             => _gradeService.GetById(id);
 
         public int GetStep(UserResponse userResponse)

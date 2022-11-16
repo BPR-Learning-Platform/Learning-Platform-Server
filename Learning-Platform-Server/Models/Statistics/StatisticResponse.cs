@@ -1,5 +1,4 @@
-﻿using Learning_Platform_Server.Entities;
-using Learning_Platform_Server.Models.Scores;
+﻿using Learning_Platform_Server.Models.Scores;
 using System.Text.Json.Serialization;
 
 namespace Learning_Platform_Server.Models.Statistics

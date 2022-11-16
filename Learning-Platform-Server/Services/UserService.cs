@@ -1,26 +1,17 @@
 ﻿using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.Services
 {
     public interface IUserService
     {
         UserResponse SignInUser(SignInRequest signInRequest);
-        UserResponse? GetById(string id);
+        UserResponse GetById(string id);
         List<UserResponse> GetByGradeId(int gradeId);
         void Create(CreateUserRequest createUserRequest);
-        UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo);
-        ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo);
+        UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo);
     }
 
     public class UserService : IUserService
@@ -35,7 +26,7 @@ namespace Learning_Platform_Server.Services
         public UserResponse SignInUser(SignInRequest signInRequest)
             => _userDAO.SignInUser(signInRequest);
 
-        public UserResponse? GetById(string id)
+        public UserResponse GetById(string id)
             => _userDAO.GetById(id);
 
         public List<UserResponse> GetByGradeId(int gradeId)
@@ -44,7 +35,7 @@ namespace Learning_Platform_Server.Services
         public void Create(CreateUserRequest createUserRequest)
             => _userDAO.Create(createUserRequest);
 
-        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo? correctInfo)
+        public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo)
         {
             if (userResponse.Score is null)
                 throw new NullReferenceException("No score was found for the user: " + userResponse);
@@ -61,38 +52,53 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        public ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo? correctInfo) //TODO Calculate new score
+        public static ScoreResponse CalculateNewScore(ScoreResponse score, CorrectInfo correctInfo)
         {
-            /* int correct = 100;
-             int score = 3; 
+            return new ScoreResponse()
+            {
+                A = CalulateNewScorePoint(score.A, correctInfo.A),
+                M = CalulateNewScorePoint(score.M, correctInfo.M),
+                S = CalulateNewScorePoint(score.S, correctInfo.S),
+                D = CalulateNewScorePoint(score.D, correctInfo.D)
+            };
 
-             float correctNumber = 0;
-             if (correct > 0)
-                 correctNumber = correct / 100 * Util.BatchSize;
+            static float? CalulateNewScorePoint(float? subScore, ScorePoint? scorePoint)
+            {
+                if (subScore is null || scorePoint is null)
+                    return Util.MinimumScore;
 
-             float incorrectNumber = Util.BatchSize - correctNumber;
+                if (scorePoint.Count == 0)
+                    return subScore;
 
-             // increase/decrease score with 0.1 points for each correct/incorrect answer
-             float change = (correctNumber - incorrectNumber) / 10;
-             float newScore = score + change;
 
-             //rounding the result
-             newScore = (float)Math.Round((newScore), 2);
+                float correctPercentage = 0;
+                if (scorePoint.Percentage is not null)
+                    correctPercentage = (int)scorePoint.Percentage;
 
-             if (newScore < Util.MinimumScore)
-                 newScore = Util.MinimumScore;
-             else if (newScore > Util.MaximumScore)
-                 newScore = Util.MinimumScore; */
+                int correctNumber = 0;
+                if (correctPercentage > 0)
+                    correctNumber = (int)(correctPercentage / 100 * scorePoint.Count);
 
-            return new ScoreResponse() { A = GetRandomFloat(), M = GetRandomFloat(), S = GetRandomFloat(), D = GetRandomFloat() }; // TODO Remove dummy data
-        }
+                int incorrectNumber = scorePoint.Count - correctNumber;
 
-        static float GetRandomFloat()
-        {
-            System.Random random = new();
-            double val = (random.NextDouble() * (3 - 1) + 1);
-            float randomFloat = (float)val;
-            return (float)Math.Round((randomFloat), 1);
+                float change = 0;
+                // increase/decrease score with 0.1 points for each correct/incorrect answer
+                if (correctNumber != incorrectNumber)
+                    change = ((float)(correctNumber - incorrectNumber)) / 10;
+
+
+                float newScore = (float)subScore + change;
+
+                //rounding the result
+                newScore = (float)Math.Round((newScore), 2);
+
+                if (newScore < Util.MinimumScore)
+                    newScore = Util.MinimumScore;
+                else if (newScore > Util.MaximumScore)
+                    newScore = Util.MinimumScore;
+
+                return newScore;
+            }
         }
     }
 }

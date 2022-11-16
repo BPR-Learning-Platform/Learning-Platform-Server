@@ -1,21 +1,14 @@
 ﻿using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Text;
 
 namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds);
+        List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds);
     }
 
     public class TaskService : ITaskService
@@ -31,12 +24,9 @@ namespace Learning_Platform_Server.Services
             _gradeService = gradeService;
         }
 
-        public List<TaskResponse> GetBatch(string userid, CorrectInfo? correctInfo, List<string> previousTaskIds)
+        public List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds)
         {
-            UserResponse? userResponse = _userService.GetById(userid);
-
-            if (userResponse is null)
-                throw new Exception("No user was found for userid " + userid);
+            UserResponse userResponse = _userService.GetById(userid);
 
             int step = _gradeService.GetStep(userResponse);
             List<TaskResponse> taskResponseList = _taskDAO.GetAll(step);
