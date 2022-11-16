@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.DAOs
 {
     public interface IStatisticDAO
     {
-        List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId);
+        List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId, int? step);
     }
 
     public class StatisticDAO : IStatisticDAO
@@ -20,7 +20,7 @@ namespace Learning_Platform_Server.DAOs
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
 
-        public List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId)
+        public List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId, int? step)
         {
             string parameterString = "";
 
@@ -28,6 +28,8 @@ namespace Learning_Platform_Server.DAOs
                 parameterString = "?studentid=" + studentId;
             else if (gradeId.HasValue)
                 parameterString = "?gradeid=" + gradeId;
+            else if (step.HasValue)
+                parameterString = "?step=" + step;
 
             HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "statistic" + parameterString);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;

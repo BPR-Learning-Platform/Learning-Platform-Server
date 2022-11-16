@@ -7,6 +7,7 @@ namespace Learning_Platform_Server.Models.Statistics
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? StudentId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? GradeId { get; set; }
         public ScoreResponse? Score { get; set; }
         public DateTime TimeStamp { get; set; }

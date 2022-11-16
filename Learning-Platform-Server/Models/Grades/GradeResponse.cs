@@ -6,6 +6,7 @@ namespace Learning_Platform_Server.Models.Grades
     public class GradeResponse
     {
         public string? GradeId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Step { get; set; }
         public string? GradeName { get; set; }
 
@@ -20,6 +21,7 @@ namespace Learning_Platform_Server.Models.Grades
     public class GradeResponseToTeacher
     {
         public string? GradeId { get; set; }
+        public int? Step { get; set; }
         public string? GradeName { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
