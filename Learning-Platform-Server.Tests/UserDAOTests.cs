@@ -28,7 +28,7 @@ namespace Learning_Platform_Server.Tests
         [Fact]
         public void UpdateUser_updates_user_score_correctly()
         {
-            string studentId = "144";
+            string studentId = "124";
             IHttpClientFactory? httpClientFactoryMock = GetHttpClientFactoryMock();
             UserDAO? userDAO = new(httpClientFactoryMock);
 

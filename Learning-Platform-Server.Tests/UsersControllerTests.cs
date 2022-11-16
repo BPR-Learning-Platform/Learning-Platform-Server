@@ -65,7 +65,7 @@ namespace Learning_Platform_Server.Tests
         // CREATE 
 
         [Fact]
-        public async Task Create_new_user_receives_200_Ok_and_create_same_user_again_receives_403_forbidden()
+        public async Task Create_new_user_receives_200_OK_and_create_same_user_again_receives_403_forbidden()
         {
             string email = GetRandomString() + "@integrationtest.com";
 

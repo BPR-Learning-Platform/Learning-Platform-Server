@@ -27,7 +27,7 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            JsonContent content = JsonContent.Create(new { email = "student3@student.com", password = "12345678" });
+            JsonContent content = JsonContent.Create(new { email = "student1@student.com", password = "12345678" });
 
             HttpResponseMessage? responseMsg = await client.PostAsync(UsersControllerTests.SignInUrl, content);
             _output.WriteLine("Statuscode:" + responseMsg.StatusCode);
@@ -54,7 +54,7 @@ namespace Learning_Platform_Server.Tests
 
         private async Task BatchTest(HttpClient client)
         {
-            string userId = "144";
+            string userId = "124";
             string correct = "{%22A%22:{%22count%22:2,%22percentage%22:50},%22M%22:{%22count%22:1,%22percentage%22:100},%22S%22:{%22count%22:0,%22percentage%22:100},%22D%22:{%22count%22:0,%22percentage%22:0}}";
 
             HttpResponseMessage? httpResponseMessage = await client.GetAsync(TasksUrl + "?userid=" + userId + "&correct=" + correct + "&taskids=42,12,18");

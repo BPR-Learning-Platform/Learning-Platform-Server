@@ -51,6 +51,7 @@ namespace Learning_Platform_Server.Services
                     throw new KeyNotFoundException("Could not find grade with grade id " + gradeId);
 
                 string? gradeName = gradeResponse.GradeName;
+                int? step = gradeResponse.Step;
 
                 List<UserResponse> userResponseList = _userService.GetByGradeId(gradeId);
                 List<UserResponseToTeacher> studentsToTeacher = new();
@@ -67,7 +68,7 @@ namespace Learning_Platform_Server.Services
                 }
 
 
-                gradeResponsesToTeacher.Add(new GradeResponseToTeacher() { GradeId = gradeId + "", GradeName = gradeName, Students = studentsToTeacher });
+                gradeResponsesToTeacher.Add(new GradeResponseToTeacher() { GradeId = gradeId + "", GradeName = gradeName, Step = step, Students = studentsToTeacher });
             }
 
             return gradeResponsesToTeacher;
