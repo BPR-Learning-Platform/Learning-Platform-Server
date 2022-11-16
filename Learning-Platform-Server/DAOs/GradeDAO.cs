@@ -52,7 +52,7 @@ namespace Learning_Platform_Server.DAOs
 
         public GradeResponse GetById(int id)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?id=" + id);
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?gradeid=" + id);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)

@@ -57,10 +57,10 @@ namespace Learning_Platform_Server.Services
                         GradeId = val.ToList()[0].GradeId,
                         Score = new ScoreResponse()
                         {
-                            A = val.Average(x => x.Score is not null ? x.Score.A : null),
-                            M = val.Average(x => x.Score is not null ? x.Score.M : null),
-                            S = val.Average(x => x.Score is not null ? x.Score.S : null),
-                            D = val.Average(x => x.Score is not null ? x.Score.D : null)
+                            A = val.Average(x => x.Score?.A),
+                            M = val.Average(x => x.Score?.M),
+                            S = val.Average(x => x.Score?.S),
+                            D = val.Average(x => x.Score?.D)
                         },
                         TimeStamp = key
                     })
@@ -90,10 +90,10 @@ namespace Learning_Platform_Server.Services
                         //GradeId = val.ToList()[0].GradeId,
                         Score = new ScoreResponse()
                         {
-                            A = val.Average(x => x.Score is not null ? x.Score.A : null),
-                            M = val.Average(x => x.Score is not null ? x.Score.M : null),
-                            S = val.Average(x => x.Score is not null ? x.Score.S : null),
-                            D = val.Average(x => x.Score is not null ? x.Score.D : null)
+                            A = val.Average(x => x.Score?.A),
+                            M = val.Average(x => x.Score?.M),
+                            S = val.Average(x => x.Score?.S),
+                            D = val.Average(x => x.Score?.D)
                         },
                         TimeStamp = key
                     })
