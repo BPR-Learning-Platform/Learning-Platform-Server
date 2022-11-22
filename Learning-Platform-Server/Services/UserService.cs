@@ -38,7 +38,7 @@ namespace Learning_Platform_Server.Services
         public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo)
         {
             if (userResponse.Score is null)
-                throw new NullReferenceException("No score was found for the user: " + userResponse);
+                throw new ArgumentException($"No score was found for the user parameter {nameof(userResponse)}. Details: {userResponse}");
 
             userResponse.Score = CalculateNewScore(userResponse.Score, correctInfo);
 
@@ -64,20 +64,14 @@ namespace Learning_Platform_Server.Services
 
             static float? CalulateNewScorePoint(float? subScore, ScorePoint? scorePoint)
             {
-                if (subScore is null || scorePoint is null)
-                    return Util.MinimumScore;
+                subScore ??= Util.MinimumScore;
 
-                if (scorePoint.Count == 0)
+                if (scorePoint is null || scorePoint.Count == 0)
                     return subScore;
 
-
-                float correctPercentage = 0;
-                if (scorePoint.Percentage is not null)
-                    correctPercentage = (int)scorePoint.Percentage;
-
                 int correctNumber = 0;
-                if (correctPercentage > 0)
-                    correctNumber = (int)(correctPercentage / 100 * scorePoint.Count);
+                if (scorePoint.Percentage is not null and > 0)
+                    correctNumber = (int)(scorePoint.Percentage / 100 * scorePoint.Count);
 
                 int incorrectNumber = scorePoint.Count - correctNumber;
 

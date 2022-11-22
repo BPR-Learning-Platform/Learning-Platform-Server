@@ -7,6 +7,8 @@ using Xunit.Abstractions;
 
 namespace Learning_Platform_Server.Tests
 {
+    [CollectionDefinition("Serial", DisableParallelization = true)] //To avoid TaskControllerTests from failing when running all tests together. More info: https://tsuyoshiushio.medium.com/controlling-the-serial-and-parallel-test-on-xunit-6174326da196
+    [Collection("Serial")]
     public class UserDAOTests
     {
         private readonly ITestOutputHelper _output;
@@ -26,30 +28,26 @@ namespace Learning_Platform_Server.Tests
             UserResponse user = userDAO.GetById(studentId);
 
             user.Score.Should().NotBeNull();
-            if (user.Score is not null)
+            ScoreResponse newScore = new()
             {
-                ScoreResponse newScore = new()
-                {
-                    A = Change(user.Score.A),
-                    M = Change(user.Score.M),
-                    S = Change(user.Score.S),
-                    D = Change(user.Score.D)
-                };
+                A = Change(user.Score!.A),
+                M = Change(user.Score.M),
+                S = Change(user.Score.S),
+                D = Change(user.Score.D)
+            };
 
 
-                // Update
-                user.Score = newScore;
-                userDAO.UpdateUser(user);
+            // Update
+            user.Score = newScore;
+            userDAO.UpdateUser(user);
 
 
-                // Get
-                UserResponse userAfterUpdate = userDAO.GetById(studentId);
+            // Get
+            UserResponse userAfterUpdate = userDAO.GetById(studentId);
 
-                userAfterUpdate.Score.Should().NotBeNull();
-                if (userAfterUpdate.Score is not null)
-                    // Should have equally named properties with the same value
-                    userAfterUpdate.Score.Should().BeEquivalentTo(newScore);
-            }
+            userAfterUpdate.Score.Should().NotBeNull();
+            // Should have equally named properties with the same value
+            userAfterUpdate.Score?.Should().BeEquivalentTo(newScore);
         }
 
 

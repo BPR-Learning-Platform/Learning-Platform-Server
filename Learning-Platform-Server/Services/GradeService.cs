@@ -9,7 +9,7 @@ namespace Learning_Platform_Server.Services
         List<GradeResponse> GetAll();
         List<GradeResponseToTeacher> GetAllToTeacher(string teacherId);
         GradeResponse GetById(int id);
-        int GetStep(UserResponse userResponse);
+        int GetStep(UserResponse student);
     }
 
     public class GradeService : IGradeService
@@ -30,19 +30,16 @@ namespace Learning_Platform_Server.Services
         {
             UserResponse teacher = _userService.GetById(teacherId);
 
-            if (teacher.Type is null)
-                throw new NullReferenceException("No type was found for user with id " + teacherId + ", so could not determine if the user is really a teacher. Details: " + teacher);
-
-            if (!teacher.Type.Equals("T"))
+            if (!(teacher.Type == UserType.T))
                 throw new BadHttpRequestException("The user with id " + teacherId + " has a type that does not represent a teacher. Details: " + teacher);
 
+            // if no grades have been assigned to the teacher, return an empty list
             if (teacher.AssignedGradeIds is null)
-                throw new NullReferenceException("No assigned grade ids were found for the teacher: " + teacher);
+                return new();
 
             List<GradeResponse> gradeResponses = GetAll();
 
             List<GradeResponseToTeacher> gradeResponsesToTeacher = new();
-
             foreach (int gradeId in teacher.AssignedGradeIds)
             {
                 GradeResponse? gradeResponse = gradeResponses.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(gradeId + ""));
@@ -57,16 +54,9 @@ namespace Learning_Platform_Server.Services
                 List<UserResponseToTeacher> studentsToTeacher = new();
                 foreach (UserResponse user in userResponseList)
                 {
-                    if (user.Type is null)
-                    {
-                        Console.WriteLine("Could not read type from user: " + user + ", so the user is not included.");
-                        break;
-                    }
-
-                    if (user.Type.Equals("S"))
+                    if (user.Type == UserType.S)
                         studentsToTeacher.Add(new UserResponseToTeacher() { UserId = user.UserId, Name = user.Name });
                 }
-
 
                 gradeResponsesToTeacher.Add(new GradeResponseToTeacher() { GradeId = gradeId + "", GradeName = gradeName, Step = step, Students = studentsToTeacher });
             }
@@ -81,24 +71,21 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        public int GetStep(UserResponse userResponse)
+        public int GetStep(UserResponse student)
         {
-            if (userResponse.AssignedGradeIds is null || userResponse.AssignedGradeIds.Count == 0)
-                throw new Exception("No assignedgradeids were found for user with userid " + userResponse.UserId);
+            if (student.AssignedGradeIds is null || student.AssignedGradeIds.Count == 0)
+                throw new Exception("No assignedgradeids were found for user with userid " + student.UserId);
 
             // calling DAO
             List<GradeResponse> gradeResponseList = _gradeDAO.GetAll();
 
-            int assignedGradeId = userResponse.AssignedGradeIds[0];
+            int assignedGradeId = student.AssignedGradeIds[0];
 
             GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
             if (gradeResponse is null)
                 throw new Exception("No grade was found for gradeid " + assignedGradeId);
 
-            if (gradeResponse.Step is null)
-                throw new NullReferenceException("No step was found for grade with gradeid " + assignedGradeId);
-
-            return (int)gradeResponse.Step;
+            return gradeResponse.Step ?? throw new Exception($"No step was found for the students grade. Details: {gradeResponse}");
         }
     }
 }

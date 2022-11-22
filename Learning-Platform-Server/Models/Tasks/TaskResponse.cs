@@ -4,7 +4,7 @@
     {
         public string? TaskId { get; set; }
         public int? Step { get; set; }
-        public string? Type { get; set; }
+        public TaskType Type { get; set; }
         public int? Difficulty { get; set; }
         public string? Exercise { get; set; }
         public int? Answer { get; set; }

@@ -24,7 +24,7 @@ namespace Learning_Platform_Server.Controllers
             else if (step is not null && gradeId is not null)
                 statisticResponseList = _statisticService.GetAllByStep(int.Parse(step), gradeId);
             else if (gradeId is not null)
-                statisticResponseList = _statisticService.GetAllByGradeId(int.Parse(gradeId));
+                statisticResponseList = _statisticService.GetAllByGradeId(gradeId);
 
             //For debugging
             Console.WriteLine("This will be returned to frontend: " + string.Join(",\n\t", statisticResponseList));

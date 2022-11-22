@@ -28,6 +28,10 @@ namespace Learning_Platform_Server.Tests
         public async Task Get_grades_for_teacher_receives_200_OK_with_multiple_objects_of_expected_type()
         {
             HttpResponseMessage httpResponseMessage = await GetHttpResponseMessageAsync(TeacherId);
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+                _output.WriteLine("Response message content: " + await httpResponseMessage.Content.ReadAsStringAsync());
+
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
             string? responseContentString = httpResponseMessage.Content.ReadAsStringAsync().Result;
@@ -35,36 +39,34 @@ namespace Learning_Platform_Server.Tests
             List<GradeResponseToTeacher>? gradeResponseList = JsonConvert.DeserializeObject<List<GradeResponseToTeacher>>(responseContentString);
 
             gradeResponseList.Should().NotBeNullOrEmpty();
-            if (gradeResponseList is not null)
+
+            gradeResponseList!.Count.Should().BeGreaterThan(1);
+            _output.WriteLine("Number of grades deserialized: " + gradeResponseList.Count);
+
+            int totalNumberOfStudents = 0;
+            foreach (var gradeResponse in gradeResponseList)
             {
-                gradeResponseList.Count.Should().BeGreaterThan(1);
-                _output.WriteLine("Number of grades deserialized: " + gradeResponseList.Count);
+                _output.WriteLine("Found a grade: " + gradeResponse);
 
-                int totalNumberOfStudents = 0;
-                foreach (var gradeResponse in gradeResponseList)
+                // Id
+                gradeResponse.GradeId.Should().NotBeNullOrEmpty();
+                int.Parse(gradeResponse.GradeId!).Should().BeGreaterThan(0);
+
+                // Name
+                gradeResponse.GradeName.Should().NotBeNullOrEmpty();
+                gradeResponse.GradeName!.Length.Should().BeGreaterThan(0);
+
+                // Students
+                if (gradeResponse.GradeName.Equals("1A") || gradeResponse.GradeName.Equals("1B"))
                 {
-                    _output.WriteLine("Found a grade: " + gradeResponse);
-
-                    // Id
-                    gradeResponse.GradeId.Should().NotBeNull();
-                    if (gradeResponse.GradeId is not null)
-                        int.Parse(gradeResponse.GradeId).Should().BeGreaterThan(0);
-
-                    // Name
-                    gradeResponse.GradeName.Should().NotBeNull();
-                    if (gradeResponse.GradeName is not null)
-                        gradeResponse.GradeName.Length.Should().BeGreaterThan(0);
-
-                    // Students: The list of students is allowed to be empty, but should not be null
-                    gradeResponse.Students.Should().NotBeNull();
-                    if (gradeResponse.Students is not null)
-                        totalNumberOfStudents += gradeResponse.Students.Count;
-
+                    gradeResponse.Students.Should().NotBeNullOrEmpty();
+                    totalNumberOfStudents += gradeResponse.Students!.Count;
                 }
-
-                // Students: There should be student(s) in at least some of the lists
-                totalNumberOfStudents.Should().BeGreaterThan(0);
+                _output.WriteLine($"Number of students associated with {gradeResponse.GradeName}: {gradeResponse.Students?.Count: 0} ");
             }
+
+            // Students: There should be student(s) in at least some of the lists
+            totalNumberOfStudents.Should().BeGreaterThan(0);
 
         }
 
@@ -79,6 +81,8 @@ namespace Learning_Platform_Server.Tests
         public async Task Get_grades_for_nonexistent_teacher_receives_404_NotFound()
         {
             HttpResponseMessage httpResponseMessage = await GetHttpResponseMessageAsync(NonexistentId);
+
+            _output.WriteLine("Response message content: " + await httpResponseMessage.Content.ReadAsStringAsync());
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 

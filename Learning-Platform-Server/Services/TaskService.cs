@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.Services
 {
     public interface ITaskService
     {
-        List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds);
+        List<TaskResponse> GetBatch(string studentId, CorrectInfo correctInfo, List<string> previousTaskIds);
     }
 
     public class TaskService : ITaskService
@@ -24,14 +24,14 @@ namespace Learning_Platform_Server.Services
             _gradeService = gradeService;
         }
 
-        public List<TaskResponse> GetBatch(string userid, CorrectInfo correctInfo, List<string> previousTaskIds)
+        public List<TaskResponse> GetBatch(string studentId, CorrectInfo correctInfo, List<string> previousTaskIds)
         {
-            UserResponse userResponse = _userService.GetById(userid);
+            UserResponse student = _userService.GetById(studentId);
 
-            int step = _gradeService.GetStep(userResponse);
+            int step = _gradeService.GetStep(student);
             List<TaskResponse> taskResponseList = _taskDAO.GetAll(step);
 
-            taskResponseList = _taskDAO.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, userResponse)).ToList();
+            taskResponseList = _taskDAO.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, student)).ToList();
 
             List<TaskResponse> taskResponseBatchList = new();
             Random random = new();
@@ -55,7 +55,7 @@ namespace Learning_Platform_Server.Services
             }
 
             // updating the users score asynchronously each time a new batch request is received
-            Task.Run(() => _userService.UpdateUserScore(userResponse, correctInfo));
+            Task.Run(() => _userService.UpdateUserScore(student, correctInfo));
 
             // for debugging
             //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
@@ -66,34 +66,17 @@ namespace Learning_Platform_Server.Services
         public static bool TaskHasAppropiateDifficulty(TaskResponse taskResponse, UserResponse userResponse)
         {
             if (userResponse.Score is null)
-                throw new NullReferenceException("No score was found for the user: " + userResponse);
-
-            if (taskResponse.Type is null)
-                throw new NullReferenceException("No type was found for the task: " + taskResponse);
-
+                throw new ArgumentException($"No score was found for the user parameter {nameof(userResponse)}. Details: {userResponse}");
             ScoreResponse score = userResponse.Score;
 
-            float subScore = 0;
-            string subScoreName = taskResponse.Type;
-            switch (subScoreName)
+            float subScore = taskResponse.Type switch
             {
-                case "A":
-                    subScore = score.A ?? throw GetNullReferenceException();
-                    break;
-                case "S":
-                    subScore = score.S ?? throw GetNullReferenceException();
-                    break;
-                case "M":
-                    subScore = score.M ?? throw GetNullReferenceException();
-                    break;
-                case "D":
-                    subScore = score.D ?? throw GetNullReferenceException();
-                    break;
-
-                    NullReferenceException GetNullReferenceException()
-                        => new("No subscore was found for " + subScoreName + " in the user score, " +
-                            "so could not determine if the task has an appropiate difficulty. " + "Details: " + userResponse);
-            }
+                TaskType.A => score.A ?? throw new ArgumentException(nameof(score.A)),
+                TaskType.S => score.S ?? throw new ArgumentException(nameof(score.S)),
+                TaskType.M => score.M ?? throw new ArgumentException(nameof(score.M)),
+                TaskType.D => score.D ?? throw new ArgumentException(nameof(score.D)),
+                _ => throw new ArgumentException("Invalid enum value for the Type attribute of the TaskResponse object", nameof(taskResponse))
+            };
 
             // Difficulty (integer) should be equal to the integral part of the subScore (decimal number)
             // Example: Difficulty should be 2 if subScore is 2.7

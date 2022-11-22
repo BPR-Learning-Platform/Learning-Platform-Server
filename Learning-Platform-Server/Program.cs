@@ -1,6 +1,7 @@
 using Learning_Platform_Server.DAOs;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 const string allowSpecificOrigins = "_allowRequestsFromBPR-Learning-Platform-Frontend";
@@ -12,7 +13,13 @@ var services = builder.Services;
 services.AddControllers(options =>
 {
     options.Filters.Add<UnhandledExceptionFilterAttribute>();
+}).AddJsonOptions(options =>
+{
+    // For enum types, the name of the enum should be returned to clients instead of the numeric value  
+    // Example: return "S" or "T" for User.Type and return "A", "S", "M" or "D" for Task.Type
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
 services.AddMemoryCache();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

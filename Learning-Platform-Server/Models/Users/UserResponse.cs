@@ -5,7 +5,7 @@ namespace Learning_Platform_Server.Models.Users
     public class UserResponse
     {
         public string? UserId { get; set; }
-        public string? Type { get; set; }
+        public UserType Type { get; set; }
         public string? Name { get; set; }
 
         private string? _email;

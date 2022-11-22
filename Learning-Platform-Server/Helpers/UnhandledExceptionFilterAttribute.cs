@@ -16,18 +16,16 @@ namespace Learning_Platform_Server.Helpers
 
         public override void OnException(ExceptionContext context)
         {
-            int statusCode = 500;
+            int statusCode = context.Exception switch
+            {
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                KeyNotFoundException => StatusCodes.Status404NotFound,
+                BadHttpRequestException => StatusCodes.Status400BadRequest,
+                UpsertedIdNotFoundException => StatusCodes.Status403Forbidden,
+                _ => StatusCodes.Status500InternalServerError,
+            };
 
-            if (context.Exception is UnauthorizedAccessException)
-                statusCode = 401;
-            else if (context.Exception is KeyNotFoundException)
-                statusCode = 404;
-            else if (context.Exception is BadHttpRequestException)
-                statusCode = 400;
-            else if (context.Exception is ArgumentException)
-                statusCode = 403;
-
-            var result = new ObjectResult(new
+            ObjectResult result = new(new
             {
                 context.Exception.Message,
                 context.Exception.Source,

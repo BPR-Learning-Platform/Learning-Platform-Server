@@ -37,9 +37,7 @@ namespace Learning_Platform_Server.Tests
             gradeId.Should().NotBeNull();
             gradeId.Should().NotBe(0);
 
-            if (gradeId is null) throw new Exception();
-
-            GradeResponse gradeResponse = GetGradeResponseAsync(client, (int)gradeId);
+            GradeResponse gradeResponse = GetGradeResponseAsync(client, (int)gradeId!);
             _output.WriteLine("Testing with grade: " + gradeResponse);
 
             string? userId = userResponse?.UserId; // "124";
@@ -52,73 +50,61 @@ namespace Learning_Platform_Server.Tests
             string? taskResponseContentString = taskHttpResponseMessage.Content.ReadAsStringAsync().Result;
             taskResponseContentString.Should().NotBeNullOrEmpty();
             List<TaskResponse>? taskResponseList = JsonConvert.DeserializeObject<List<TaskResponse>>(taskResponseContentString);
-            _output.WriteLine("taskResponseList: \n\t" + (taskResponseList is not null ? string.Join(",\n\t", taskResponseList) : ""));
-
             taskResponseList.Should().NotBeNullOrEmpty();
-            if (taskResponseList is not null)
+            _output.WriteLine("taskResponseList: \n\t" + (string.Join(",\n\t", taskResponseList!)));
+
+            taskResponseList!.Count.Should().BeGreaterThan(1);
+            _output.WriteLine("Number of tasks deserialized: " + taskResponseList.Count);
+
+            foreach (var taskResponse in taskResponseList)
             {
-                taskResponseList.Count.Should().BeGreaterThan(1);
-                _output.WriteLine("Number of tasks deserialized: " + taskResponseList.Count);
+                // Id
+                taskResponse.TaskId.Should().NotBeNullOrEmpty();
+                int.Parse(taskResponse.TaskId!).Should().BeGreaterThan(0);
 
-                foreach (var taskResponse in taskResponseList)
+                // Exercise
+                taskResponse.Exercise.Should().NotBeNullOrEmpty();
+                taskResponse.Exercise?.Length.Should().BeGreaterThan(0);
+
+                gradeResponse.Step.Should().NotBeNull();
+                taskResponse.Step.Should().Be((int)gradeResponse.Step!);
+                // Step: should match the step associated with the users grade
+                _output.WriteLine("gradeResponse.Step: " + gradeResponse.Step + ". taskResponse.Step: " + taskResponse.Step);
+
+                // Type
+                List<TaskType> list = new() { TaskType.A, TaskType.S, TaskType.M, TaskType.D };
+                list.Should().Contain(taskResponse.Type);
+
+                // Difficulty
+                taskResponse.Difficulty.Should().BeGreaterThanOrEqualTo(1);
+
+                userResponse.Should().NotBeNull();
+                userResponse!.Score.Should().NotBeNull();
+
+                float subScore = 0;
+                switch (taskResponse.Type)
                 {
-                    // Id
-                    taskResponse.TaskId.Should().NotBeNull();
-                    if (taskResponse.TaskId is not null)
-                        int.Parse(taskResponse.TaskId).Should().BeGreaterThan(0);
-
-                    // Exercise
-                    taskResponse.Exercise.Should().NotBeNull();
-                    if (taskResponse.Exercise is not null)
-                        taskResponse.Exercise.Length.Should().BeGreaterThan(0);
-
-                    // Step: should match the step associated with the users grade
-                    if (gradeResponse.Step is null) throw new Exception();
-                    _output.WriteLine("gradeResponse.Step: " + gradeResponse.Step + ". taskResponse.Step: " + taskResponse.Step);
-                    taskResponse.Step.Should().Be((int)gradeResponse.Step);
-
-                    // Type
-                    List<string> list = new() { "A", "S", "M", "D" };
-                    list.Should().Contain(taskResponse.Type);
-
-                    // Difficulty
-                    taskResponse.Difficulty.Should().BeGreaterThanOrEqualTo(1);
-
-                    userResponse.Should().NotBeNull();
-                    userResponse?.Score.Should().NotBeNull();
-
-                    if (userResponse?.Score is not null)
-                    {
-                        float subScore = 0;
-                        switch (taskResponse.Type)
-                        {
-                            case "A":
-                                userResponse.Score.A.Should().NotBeNull();
-                                if (userResponse.Score.A is not null)
-                                    subScore = (float)userResponse.Score.A;
-                                break;
-                            case "S":
-                                userResponse.Score.S.Should().NotBeNull();
-                                if (userResponse.Score.S is not null)
-                                    subScore = (float)userResponse.Score.S;
-                                break;
-                            case "M":
-                                userResponse.Score.M.Should().NotBeNull();
-                                if (userResponse.Score.M is not null)
-                                    subScore = (float)userResponse.Score.M;
-                                break;
-                            case "D":
-                                userResponse.Score.D.Should().NotBeNull();
-                                if (userResponse.Score.D is not null)
-                                    subScore = (float)userResponse.Score.D;
-                                break;
-                        }
-                        taskResponse.Difficulty.Should().Be((int)subScore);
-                    }
-
-                    // Answer
-                    // taskResponse.Answer
+                    case TaskType.A:
+                        userResponse.Score!.A.Should().NotBeNull();
+                        subScore = (float)userResponse.Score.A!;
+                        break;
+                    case TaskType.S:
+                        userResponse.Score!.S.Should().NotBeNull();
+                        subScore = (float)userResponse.Score.S!;
+                        break;
+                    case TaskType.M:
+                        userResponse.Score!.M.Should().NotBeNull();
+                        subScore = (float)userResponse.Score.M!;
+                        break;
+                    case TaskType.D:
+                        userResponse.Score!.D.Should().NotBeNull();
+                        subScore = (float)userResponse.Score.D!;
+                        break;
                 }
+                taskResponse.Difficulty.Should().Be((int)subScore);
+
+                // Answer
+                // taskResponse.Answer
             }
         }
 
