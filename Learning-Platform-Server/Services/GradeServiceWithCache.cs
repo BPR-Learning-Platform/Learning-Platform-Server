@@ -53,8 +53,8 @@ namespace Learning_Platform_Server.Services
         public GradeResponse GetById(int id)
             => _gradeService.GetById(id);
 
-        public int GetStep(UserResponse userResponse)
-            => _gradeService.GetStep(userResponse);
+        public int GetStep(UserResponse student)
+            => _gradeService.GetStep(student);
 
 
 

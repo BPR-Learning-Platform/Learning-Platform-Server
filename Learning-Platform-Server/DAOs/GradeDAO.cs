@@ -52,7 +52,7 @@ namespace Learning_Platform_Server.DAOs
 
         public GradeResponse GetById(int id)
         {
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?id=" + id);
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "grade?gradeid=" + id);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
@@ -63,15 +63,9 @@ namespace Learning_Platform_Server.DAOs
             if (gradeRootBsonArray.Count != 0)
             {
                 BsonValue gradeRootBsonValue = gradeRootBsonArray[0];
+                MongoDbGradeRoot mongoDbGradeRoot = MapToMongoDbGradeRoot(gradeRootBsonValue);
 
-                MongoDbGradeRoot? mongoDbGradeRoot = MapToMongoDbGradeRoot(gradeRootBsonValue);
-                if (mongoDbGradeRoot is null)
-                    throw new NullReferenceException("GradeRoot was not found");
-
-                GradeResponse? gradeResponse = MapToGradeResponse(mongoDbGradeRoot);
-                if (gradeResponse is null)
-                    throw new NullReferenceException("GradeResponse was not found");
-
+                GradeResponse gradeResponse = MapToGradeResponse(mongoDbGradeRoot);
                 return gradeResponse;
             }
 
@@ -82,40 +76,25 @@ namespace Learning_Platform_Server.DAOs
 
         // helper methods
 
-        private static MongoDbGradeRoot? MapToMongoDbGradeRoot(BsonValue gradeRootBsonValue)
+        private static MongoDbGradeRoot MapToMongoDbGradeRoot(BsonValue gradeRootBsonValue)
         {
-            string? gradeRootJson = MongoDbHelper.MapToJson(gradeRootBsonValue);
+            string gradeRootJson = MongoDbHelper.MapToJson(gradeRootBsonValue);
 
-            if (gradeRootJson is null)
-            {
-                Console.WriteLine("gradeRootJson is null, so mapping to GradeRoot is not completed. ");
-                return null;
-            }
-
-            MongoDbGradeRoot? mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson);
+            MongoDbGradeRoot mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson) ?? throw new ArgumentNullException(nameof(gradeRootJson));
 
             return mongoDbGradeRoot;
         }
 
-        private static GradeResponse? MapToGradeResponse(MongoDbGradeRoot mongoDbGradeRoot)
+        private static GradeResponse MapToGradeResponse(MongoDbGradeRoot mongoDbGradeRoot)
         {
-            if (mongoDbGradeRoot.Grade is null)
-            {
-                Console.WriteLine("Grade was not found in mongoDbGradeRoot");
-                return null;
-            }
-
-            if (mongoDbGradeRoot.GradeId is null)
-            {
-                Console.WriteLine("GradeId was not found in mongoDbGradeRoot");
-                return null;
-            }
+            MongoDbGrade grade = mongoDbGradeRoot.Grade ?? throw new ArgumentException(nameof(mongoDbGradeRoot.Grade));
+            GradeId gradeId = mongoDbGradeRoot.GradeId ?? throw new ArgumentException(nameof(mongoDbGradeRoot.GradeId));
 
             return new GradeResponse()
             {
-                GradeId = mongoDbGradeRoot.GradeId.NumberLong,
-                Step = mongoDbGradeRoot.Grade.Step is not null ? int.Parse(mongoDbGradeRoot.Grade.Step) : -1,
-                GradeName = mongoDbGradeRoot.Grade.GradeName
+                GradeId = mongoDbGradeRoot.GradeId.NumberLong ?? throw new ArgumentException(nameof(gradeId.NumberLong)),
+                Step = int.Parse(grade.Step ?? throw new ArgumentException(nameof(grade.Step))),
+                GradeName = grade.GradeName ?? throw new ArgumentException(nameof(grade.GradeName))
             };
         }
     }

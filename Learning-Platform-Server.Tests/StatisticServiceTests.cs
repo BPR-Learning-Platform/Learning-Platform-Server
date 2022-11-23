@@ -46,7 +46,7 @@ namespace Learning_Platform_Server.Tests
 
 
             // Act
-            List<StatisticResponse> foundAvgStatistics = StatisticService.GetAvg(statisticListForTheGrade);
+            List<StatisticResponse> foundAvgStatistics = StatisticService.GetAvg(statisticListForTheGrade, gradeId);
             List<ScoreResponse?>? foundAvgScores = foundAvgStatistics.Select(x => x.Score).ToList(); //projecting the ScoreResponse, in order to be able to compare with expectedAvgScores
 
             _output.WriteLine("Expected AvgScores: \n\t" + string.Join(",\t", expectedAvgScores));

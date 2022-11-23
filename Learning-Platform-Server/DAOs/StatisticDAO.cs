@@ -8,7 +8,7 @@ namespace Learning_Platform_Server.DAOs
 {
     public interface IStatisticDAO
     {
-        List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId, int? step);
+        List<StatisticResponse> GetAllByParameter(int? studentId, string? gradeId, int? step);
     }
 
     public class StatisticDAO : IStatisticDAO
@@ -20,13 +20,13 @@ namespace Learning_Platform_Server.DAOs
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
 
-        public List<StatisticResponse> GetAllByParameter(int? studentId, int? gradeId, int? step)
+        public List<StatisticResponse> GetAllByParameter(int? studentId, string? gradeId, int? step)
         {
             string parameterString = "";
 
             if (studentId.HasValue)
                 parameterString = "?studentid=" + studentId;
-            else if (gradeId.HasValue)
+            else if (gradeId is not null)
                 parameterString = "?gradeid=" + gradeId;
             else if (step.HasValue)
                 parameterString = "?step=" + step;
@@ -43,15 +43,10 @@ namespace Learning_Platform_Server.DAOs
 
             foreach (BsonValue statisticRootBsonValue in statisticRootBsonArray)
             {
-                MongoDbStatisticRoot? mongoDbStatisticRoot = MapToMongoDbStatisticRoot(statisticRootBsonValue);
-                if (mongoDbStatisticRoot is null)
-                    break;
+                MongoDbStatisticRoot mongoDbStatisticRoot = MapToMongoDbStatisticRoot(statisticRootBsonValue);
 
-                StatisticResponse? statisticResponse = MapToStatisticResponse(mongoDbStatisticRoot);
-
-                // only return valid statistics
-                if (statisticResponse is not null)
-                    statisticList.Add(statisticResponse);
+                StatisticResponse statisticResponse = MapToStatisticResponse(mongoDbStatisticRoot);
+                statisticList.Add(statisticResponse);
 
             }
 
@@ -62,61 +57,29 @@ namespace Learning_Platform_Server.DAOs
 
         // helper methods
 
-        private static MongoDbStatisticRoot? MapToMongoDbStatisticRoot(BsonValue statisticRootBsonValue)
+        private static MongoDbStatisticRoot MapToMongoDbStatisticRoot(BsonValue statisticRootBsonValue)
         {
-            string? statisticRootJson = MongoDbHelper.MapToJson(statisticRootBsonValue);
+            string statisticRootJson = MongoDbHelper.MapToJson(statisticRootBsonValue);
 
-            if (statisticRootJson is null)
-            {
-                Console.WriteLine("statisticRootJson is null, so mapping to StatisticRoot is not completed. ");
-                return null;
-            }
-
-            MongoDbStatisticRoot? mongoDbStatisticRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatisticRoot>(statisticRootJson);
+            MongoDbStatisticRoot mongoDbStatisticRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatisticRoot>(statisticRootJson) ?? throw new ArgumentNullException(nameof(statisticRootJson));
 
             return mongoDbStatisticRoot;
         }
 
-        private static StatisticResponse? MapToStatisticResponse(MongoDbStatisticRoot mongoDbStatisticRoot)
+        private static StatisticResponse MapToStatisticResponse(MongoDbStatisticRoot mongoDbStatisticRoot)
         {
-            if (mongoDbStatisticRoot.Statistic is null)
-            {
-                Console.WriteLine("Statistic was not found in mongoDbStatisticRoot");
-                return null;
-            }
+            MongoDbStatistic statistic = mongoDbStatisticRoot.Statistic ?? throw new ArgumentException(nameof(mongoDbStatisticRoot.Statistic));
+            UserId userId = mongoDbStatisticRoot.UserId ?? throw new ArgumentException(nameof(mongoDbStatisticRoot.UserId));
 
-            if (mongoDbStatisticRoot.Statistic.Score is null)
-            {
-                Console.WriteLine("Score was not found in mongoDbStatisticRoot.Statistic");
-                return null;
-            }
-
-            if (mongoDbStatisticRoot.UserId is null)
-            {
-                Console.WriteLine("UserId was not found in mongoDbStatisticRoot");
-                return null;
-            }
-
-            if (mongoDbStatisticRoot.TimeStamp is null)
-            {
-                Console.WriteLine("TimeStamp was not found in mongoDbStatisticRoot");
-                return null;
-            }
-
-            if (mongoDbStatisticRoot.TimeStamp.DateTime is null)
-            {
-                Console.WriteLine("DateTime was not found in TimeStamp");
-                return null;
-            }
-
-
-            var date = mongoDbStatisticRoot.TimeStamp.DateTime.NumberLong;
+            TimeStamp timeStamp = mongoDbStatisticRoot.TimeStamp ?? throw new ArgumentException(nameof(mongoDbStatisticRoot.UserId));
+            MongoDBDate dateTime = timeStamp.DateTime ?? throw new ArgumentException(nameof(timeStamp.DateTime));
+            long date = dateTime.NumberLong;
 
             return new StatisticResponse()
             {
-                StudentId = mongoDbStatisticRoot.UserId.NumberLong,
-                GradeId = mongoDbStatisticRoot.Statistic.GradeId,
-                Score = UserDAO.MapToScoreResponse(mongoDbStatisticRoot.Statistic.Score),
+                StudentId = userId.NumberLong ?? throw new ArgumentException(nameof(userId.NumberLong)),
+                GradeId = statistic.GradeId ?? throw new ArgumentException(nameof(statistic.Score)),
+                Score = UserDAO.MapToScoreResponse(statistic.Score ?? throw new ArgumentException(nameof(statistic.Score))),
                 TimeStamp = MongoDbHelper.MapToDateTime(date)
             };
         }

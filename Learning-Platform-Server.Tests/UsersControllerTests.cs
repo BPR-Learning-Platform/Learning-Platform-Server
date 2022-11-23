@@ -29,11 +29,11 @@ namespace Learning_Platform_Server.Tests
 
             JsonContent content = JsonContent.Create(new { email = "student3@student.com", password = "12345678" });
 
-            HttpResponseMessage? responseMsg = await client.PostAsync(SignInUrl, content);
-            _output.WriteLine("Statuscode:" + responseMsg.StatusCode);
+            HttpResponseMessage? httpResponseMessage = await client.PostAsync(SignInUrl, content);
+            _output.WriteLine("Statuscode:" + httpResponseMessage.StatusCode);
             _output.WriteLine(content.ReadAsStringAsync().Result);
 
-            responseMsg.StatusCode.Should().Be(HttpStatusCode.OK);
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
@@ -44,9 +44,10 @@ namespace Learning_Platform_Server.Tests
 
             JsonContent content = JsonContent.Create(new { email = "noone@email.dk", password = "12345678" });
 
-            HttpResponseMessage? responseMsg = await client.PostAsync(SignInUrl, content);
+            HttpResponseMessage? httpResponseMessage = await client.PostAsync(SignInUrl, content);
 
-            responseMsg.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            _output.WriteLine("Response message content: " + await httpResponseMessage.Content.ReadAsStringAsync());
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -56,9 +57,10 @@ namespace Learning_Platform_Server.Tests
             using var client = application.CreateClient();
 
             JsonContent content = JsonContent.Create(new { email = "student20@student.com", password = "wrongpassword" });
-            HttpResponseMessage? responseMsg = await client.PostAsync(SignInUrl, content);
+            HttpResponseMessage? httpResponseMessage = await client.PostAsync(SignInUrl, content);
 
-            responseMsg.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            _output.WriteLine("Response message content: " + await httpResponseMessage.Content.ReadAsStringAsync());
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
 
@@ -69,11 +71,11 @@ namespace Learning_Platform_Server.Tests
         {
             string email = GetRandomString() + "@integrationtest.com";
 
-            HttpResponseMessage responseMsg = await CreateUserAsync(email);
-            responseMsg.StatusCode.Should().Be(HttpStatusCode.Created);
+            HttpResponseMessage httpResponseMessage = await CreateUserAsync(email);
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Created);
 
-            responseMsg = await CreateUserAsync(email);
-            responseMsg.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            httpResponseMessage = await CreateUserAsync(email);
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         // helper methods
@@ -85,14 +87,14 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            JsonContent content = JsonContent.Create(new CreateUserRequest() { Email = email, AssignedGradeIds = new() { 3 }, Name = randomString, Password = "integrationtestpassword", Type = "S" });
+            JsonContent content = JsonContent.Create(new CreateUserRequest() { Email = email, AssignedGradeIds = new() { 3 }, Name = randomString, Password = "integrationtestpassword", Type = UserType.S });
 
-            HttpResponseMessage? responseMsg = await client.PostAsync(Url, content);
+            HttpResponseMessage? httpResponseMessage = await client.PostAsync(Url, content);
 
-            _output.WriteLine("Statuscode:" + responseMsg.StatusCode);
+            _output.WriteLine("Statuscode:" + httpResponseMessage.StatusCode);
             _output.WriteLine(content.ReadAsStringAsync().Result);
 
-            return responseMsg;
+            return httpResponseMessage;
         }
 
         private static string GetRandomString()

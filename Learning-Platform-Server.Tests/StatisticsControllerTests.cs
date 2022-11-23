@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Statistics;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
@@ -12,9 +13,6 @@ namespace Learning_Platform_Server.Tests
         private const string StatisticsUrl = "/statistics";
         private readonly ITestOutputHelper _output;
 
-        private const float MinimumScore = 1.0f;
-        private const float MaximumScore = 3.9f;
-
         public StatisticsControllerTests(ITestOutputHelper output)
         {
             _output = output;
@@ -27,8 +25,7 @@ namespace Learning_Platform_Server.Tests
             List<StatisticResponse>? statisticResponseList = await GetStatisticResponseListAsync("?studentid=" + studentId);
 
             statisticResponseList.Should().NotBeNullOrEmpty();
-            if (statisticResponseList is not null)
-                TestStatisticList(statisticResponseList, false);
+            TestStatisticList(statisticResponseList!, false);
         }
 
         [Fact]
@@ -38,10 +35,7 @@ namespace Learning_Platform_Server.Tests
             List<StatisticResponse>? statisticListWithAvgScores = await GetStatisticResponseListAsync("?gradeid=" + gradeId);
 
             statisticListWithAvgScores.Should().NotBeNullOrEmpty();
-            if (statisticListWithAvgScores is not null)
-            {
-                TestStatisticList(statisticListWithAvgScores, true);
-            }
+            TestStatisticList(statisticListWithAvgScores!, true);
         }
 
 
@@ -76,23 +70,18 @@ namespace Learning_Platform_Server.Tests
                 _output.WriteLine("Found a statistic: " + statisticResponse);
 
                 // GradeId
-                statisticResponse.GradeId.Should().NotBeNull();
-                if (statisticResponse.GradeId is not null)
-                    int.Parse(statisticResponse.GradeId).Should().BeGreaterThan(0);
+                statisticResponse.GradeId.Should().NotBeNullOrEmpty();
+                int.Parse(statisticResponse.GradeId!).Should().BeGreaterThan(0);
 
                 // TimeStamp
                 statisticResponse.TimeStamp.Should().BeAfter(new DateTime(2022, 01, 01));
 
                 // Score
                 statisticResponse.Score.Should().NotBeNull();
-                if (statisticResponse.Score is not null)
-                {
-                    TestScore(statisticResponse.Score.A);
-                    TestScore(statisticResponse.Score.M);
-                    TestScore(statisticResponse.Score.S);
-                    TestScore(statisticResponse.Score.D);
-                }
-
+                TestScore(statisticResponse.Score!.A);
+                TestScore(statisticResponse.Score.M);
+                TestScore(statisticResponse.Score.S);
+                TestScore(statisticResponse.Score.D);
 
                 // Check for rules that depend on the query parameter
 
@@ -100,10 +89,10 @@ namespace Learning_Platform_Server.Tests
                 if (byGradeId)
                     statisticResponse.StudentId.Should().BeNull();
                 else
-                    statisticResponse.StudentId.Should().NotBeNull();
+                    statisticResponse.StudentId.Should().NotBeNullOrEmpty();
             }
 
-            void TestScore(float? score) => score.Should().BeGreaterOrEqualTo(MinimumScore);
+            static void TestScore(float? score) => score.Should().BeGreaterOrEqualTo(Util.MinimumScore);
         }
     }
 }

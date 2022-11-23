@@ -2,7 +2,7 @@
 {
     public class CreateUserRequest
     {
-        public string? Type { get; set; }
+        public UserType Type { get; set; }
         public string? Name { get; set; }
         private string? _email;
         public string? Email

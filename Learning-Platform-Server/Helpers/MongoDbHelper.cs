@@ -6,6 +6,10 @@ namespace Learning_Platform_Server.Helpers
 {
     public class MongoDbHelper
     {
+        public const string UpsertedId = "upsertedId";
+        public const string MatchedCount = "matchedCount";
+        public const string ModifiedCount = "modifiedCount";
+
         public static BsonArray MapToBsonArray(HttpResponseMessage httpResponseMessage)
         {
             string? bsonString = httpResponseMessage.Content.ReadAsStringAsync().Result;
@@ -13,7 +17,7 @@ namespace Learning_Platform_Server.Helpers
             return bsonArray;
         }
 
-        public static string? MapToJson(BsonValue bsonValue)
+        public static string MapToJson(BsonValue bsonValue)
         {
             {
                 JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };

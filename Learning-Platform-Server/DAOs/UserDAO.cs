@@ -40,13 +40,9 @@ namespace Learning_Platform_Server.DAOs
                 throw new UnauthorizedAccessException("No user was found with the given credentials");
 
             BsonValue userRootBsonValue = userRootBsonArray[0];
-
-            MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
-            if (mongoDbUserRoot is null)
-                throw new Exception("Could not read user information from BsonValue");
+            MongoDbUserRoot mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
 
             UserResponse userResponse = MapToUserResponse(mongoDbUserRoot);
-
             return userResponse;
         }
 
@@ -63,13 +59,9 @@ namespace Learning_Platform_Server.DAOs
             if (userRootBsonArray.Count != 0)
             {
                 BsonValue userRootBsonValue = userRootBsonArray[0];
-
-                MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
-                if (mongoDbUserRoot is null)
-                    throw new Exception("Could not read user information from BsonValue");
+                MongoDbUserRoot mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
 
                 UserResponse userResponse = MapToUserResponse(mongoDbUserRoot);
-
                 return userResponse;
             }
             throw new KeyNotFoundException("Could not find any user with id " + id);
@@ -89,16 +81,10 @@ namespace Learning_Platform_Server.DAOs
 
             foreach (BsonValue userRootBsonValue in userRootBsonArray)
             {
-                MongoDbUserRoot? mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
-                if (mongoDbUserRoot is null)
-                    break;
+                MongoDbUserRoot mongoDbUserRoot = MapToMongoDbUserRoot(userRootBsonValue);
 
-                UserResponse? userResponse = MapToUserResponse(mongoDbUserRoot);
-
-                // only return valid users
-                if (userResponse is not null)
-                    userList.Add(userResponse);
-
+                UserResponse userResponse = MapToUserResponse(mongoDbUserRoot);
+                userList.Add(userResponse);
             }
 
             return userList;
@@ -147,10 +133,7 @@ namespace Learning_Platform_Server.DAOs
             if (responseJobject is null)
                 throw new Exception();
 
-            JToken? upsertedIdJToken = responseJobject["upsertedId"];
-
-            if (upsertedIdJToken is null)
-                throw new ArgumentException("Database did not create a new user. Maybe the email already existed. Details: " + mongoDbUser);
+            JToken upsertedIdJToken = responseJobject[MongoDbHelper.UpsertedId] ?? throw new UpsertedIdNotFoundException("Database did not create a new user. Maybe the email already existed. Details: " + mongoDbUser);
         }
 
         private static void ValidateMongoDbPutRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)
@@ -164,9 +147,9 @@ namespace Learning_Platform_Server.DAOs
             if (responseJobject is null)
                 throw new Exception();
 
-            JToken? upsertedIdJToken = responseJobject["upsertedId"];
-            JToken? matchedCountJToken = responseJobject["matchedCount"];
-            JToken? modifiedCountJToken = responseJobject["modifiedCount"];
+            JToken? upsertedIdJToken = responseJobject[MongoDbHelper.UpsertedId];
+            JToken? matchedCountJToken = responseJobject[MongoDbHelper.MatchedCount];
+            JToken? modifiedCountJToken = responseJobject[MongoDbHelper.ModifiedCount];
 
             if (upsertedIdJToken is not null)
                 throw new Exception("Database inserted a new user instead of updating an existing user. Details: " + mongoDbUser);
@@ -181,17 +164,11 @@ namespace Learning_Platform_Server.DAOs
                 throw new Exception("Database did not behave as expected Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
         }
 
-        private static MongoDbUserRoot? MapToMongoDbUserRoot(BsonValue userRootBsonValue)
+        private static MongoDbUserRoot MapToMongoDbUserRoot(BsonValue userRootBsonValue)
         {
-            string? userRootJson = MongoDbHelper.MapToJson(userRootBsonValue);
+            string userRootJson = MongoDbHelper.MapToJson(userRootBsonValue);
 
-            if (userRootJson is null)
-            {
-                Console.WriteLine("userRootJson is null, so mapping to UserRoot is not completed. ");
-                return null;
-            }
-
-            MongoDbUserRoot? mongoDbUserRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbUserRoot>(userRootJson);
+            MongoDbUserRoot mongoDbUserRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbUserRoot>(userRootJson) ?? throw new ArgumentNullException(nameof(userRootJson));
 
             Console.WriteLine("Mapping complete, found: " + mongoDbUserRoot);
 
@@ -200,23 +177,17 @@ namespace Learning_Platform_Server.DAOs
 
         private static UserResponse MapToUserResponse(MongoDbUserRoot mongoDbUserRoot)
         {
-            if (mongoDbUserRoot.User is null)
-                throw new NullReferenceException("User was not found in mongoDbUserRoot");
-
-            if (mongoDbUserRoot.UserId is null)
-                throw new NullReferenceException("UserId was not found in mongoDbUserRoot");
-
-            if (mongoDbUserRoot.User.Score is null)
-                throw new NullReferenceException("Score was not found in mongoDbUserRoot");
+            MongoDbUser user = mongoDbUserRoot.User ?? throw new ArgumentException(nameof(mongoDbUserRoot.User));
+            UserId userId = mongoDbUserRoot.UserId ?? throw new ArgumentException(nameof(mongoDbUserRoot.UserId));
 
             return new UserResponse()
             {
-                UserId = mongoDbUserRoot.UserId.NumberLong,
-                Type = mongoDbUserRoot.User.Type,
-                Name = mongoDbUserRoot.User.Name,
-                Email = mongoDbUserRoot.User.Email,
-                Score = MapToScoreResponse(mongoDbUserRoot.User.Score),
-                AssignedGradeIds = mongoDbUserRoot.User.assignedgradeids
+                UserId = userId.NumberLong,
+                Type = Enum.Parse<UserType>(user.Type ?? throw new ArgumentException(nameof(user.Type))),
+                Name = mongoDbUserRoot.User.Name ?? throw new ArgumentException(nameof(user.Name)),
+                Email = mongoDbUserRoot.User.Email ?? throw new ArgumentException(nameof(user.Email)),
+                Score = MapToScoreResponse(user.Score ?? throw new ArgumentException(nameof(user.Score))),
+                AssignedGradeIds = user.assignedgradeids ?? throw new ArgumentException(nameof(user.assignedgradeids))
             };
         }
 
@@ -236,16 +207,13 @@ namespace Learning_Platform_Server.DAOs
 
         private static MongoDbUser MapToMongoDbUser(UserResponse userResponse)
         {
-            if (userResponse.Score is null)
-                throw new NullReferenceException("Score was not found in userResponse");
-
             return new MongoDbUser()
             {
-                Type = userResponse.Type,
-                Name = userResponse.Name,
-                Email = userResponse.Email,
-                Score = MapToMongoDbScore(userResponse.Score),
-                assignedgradeids = userResponse.AssignedGradeIds
+                Type = userResponse.Type.ToString(),
+                Name = userResponse.Name ?? throw new ArgumentException(nameof(userResponse.Name)),
+                Email = userResponse.Email ?? throw new ArgumentException(nameof(userResponse.Email)),
+                Score = MapToMongoDbScore(userResponse.Score ?? throw new ArgumentException(nameof(userResponse.Score))),
+                assignedgradeids = userResponse.AssignedGradeIds ?? throw new ArgumentException(nameof(userResponse.AssignedGradeIds))
             };
         }
 
@@ -264,12 +232,12 @@ namespace Learning_Platform_Server.DAOs
         {
             return new MongoDbUser()
             {
-                Type = createUserRequest.Type,
-                Name = createUserRequest.Name,
-                Email = createUserRequest.Email,
-                Password = createUserRequest.Password,
+                Type = createUserRequest.Type.ToString(),
+                Name = createUserRequest.Name ?? throw new ArgumentException(nameof(createUserRequest.Name)),
+                Email = createUserRequest.Email ?? throw new ArgumentException(nameof(createUserRequest.Email)),
+                Password = createUserRequest.Password ?? throw new ArgumentException(nameof(createUserRequest.Password)),
                 Score = new MongoDbScore() { A = "1", M = "1", D = "1", S = "1" },
-                assignedgradeids = createUserRequest.AssignedGradeIds
+                assignedgradeids = createUserRequest.AssignedGradeIds ?? throw new ArgumentException(nameof(createUserRequest.AssignedGradeIds))
             };
         }
     }

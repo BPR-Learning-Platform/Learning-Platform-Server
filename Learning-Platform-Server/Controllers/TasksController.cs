@@ -32,12 +32,9 @@ namespace Learning_Platform_Server.Controllers
             string decodedString = stringWriter.ToString();
             Console.WriteLine("Decoded correct string: " + decodedString);
 
-            CorrectInfo? correctInfo = JsonConvert.DeserializeObject<CorrectInfo>(decodedString);
-
+            // if DeserializeObject returns null it means that correct was null
+            CorrectInfo correctInfo = JsonConvert.DeserializeObject<CorrectInfo>(decodedString) ?? throw new BadHttpRequestException("Could not read the query parameter named '" + nameof(correct) + "', because it was set to: " + correct);
             Console.Write("Deserialized CorrectInfo: " + correctInfo);
-
-            if (correctInfo is null)
-                throw new Exception("Could not read the query parameter named 'correct'");
 
             List<TaskResponse> taskResponseBatchList = _taskService.GetBatch(userid, correctInfo, previousTaskIds);
 
