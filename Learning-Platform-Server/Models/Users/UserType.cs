@@ -2,6 +2,6 @@
 {
     public enum UserType
     {
-        S, T
+        S, T, A
     }
 }
