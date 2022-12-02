@@ -161,7 +161,7 @@ namespace Learning_Platform_Server.DAOs
             int modifiedCount = int.Parse(modifiedCountJToken.ToString());
 
             if (matchedCount != 1 || modifiedCount != 1)
-                throw new Exception("Database did not behave as expected Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
+                throw new Exception("Database did not behave as expected. Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
         }
 
         private static MongoDbUserRoot MapToMongoDbUserRoot(BsonValue userRootBsonValue)
@@ -187,7 +187,7 @@ namespace Learning_Platform_Server.DAOs
                 Name = mongoDbUserRoot.User.Name ?? throw new ArgumentException(nameof(user.Name)),
                 Email = mongoDbUserRoot.User.Email ?? throw new ArgumentException(nameof(user.Email)),
                 Score = MapToScoreResponse(user.Score ?? throw new ArgumentException(nameof(user.Score))),
-                AssignedGradeIds = user.assignedgradeids ?? throw new ArgumentException(nameof(user.assignedgradeids))
+                AssignedGradeIds = user.AssignedGradeIds ?? throw new ArgumentException(nameof(user.AssignedGradeIds))
             };
         }
 
@@ -213,7 +213,7 @@ namespace Learning_Platform_Server.DAOs
                 Name = userResponse.Name ?? throw new ArgumentException(nameof(userResponse.Name)),
                 Email = userResponse.Email ?? throw new ArgumentException(nameof(userResponse.Email)),
                 Score = MapToMongoDbScore(userResponse.Score ?? throw new ArgumentException(nameof(userResponse.Score))),
-                assignedgradeids = userResponse.AssignedGradeIds ?? throw new ArgumentException(nameof(userResponse.AssignedGradeIds))
+                AssignedGradeIds = userResponse.AssignedGradeIds ?? throw new ArgumentException(nameof(userResponse.AssignedGradeIds))
             };
         }
 
@@ -237,7 +237,7 @@ namespace Learning_Platform_Server.DAOs
                 Email = createUserRequest.Email ?? throw new ArgumentException(nameof(createUserRequest.Email)),
                 Password = createUserRequest.Password ?? throw new ArgumentException(nameof(createUserRequest.Password)),
                 Score = new MongoDbScore() { A = "1", M = "1", D = "1", S = "1" },
-                assignedgradeids = createUserRequest.AssignedGradeIds ?? throw new ArgumentException(nameof(createUserRequest.AssignedGradeIds))
+                AssignedGradeIds = createUserRequest.AssignedGradeIds ?? throw new ArgumentException(nameof(createUserRequest.AssignedGradeIds))
             };
         }
     }

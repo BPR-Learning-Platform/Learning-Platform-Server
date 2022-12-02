@@ -59,7 +59,7 @@ namespace Learning_Platform_Server.Tests
 
         private void TestStatisticList(List<StatisticResponse> statisticResponseList, bool byGradeId)
         {
-            int expectedNumber = 1; //TODO Change to 3, when there are more statistics in the database
+            int expectedNumber = 3;
             statisticResponseList.Count.Should().BeGreaterThanOrEqualTo(expectedNumber);
             _output.WriteLine("Number of statistics deserialized: " + statisticResponseList.Count);
 
@@ -74,14 +74,16 @@ namespace Learning_Platform_Server.Tests
                 int.Parse(statisticResponse.GradeId!).Should().BeGreaterThan(0);
 
                 // TimeStamp
-                statisticResponse.TimeStamp.Should().BeAfter(new DateTime(2022, 01, 01));
+                statisticResponse.TimeStamp.Should()
+                    .BeAfter(new DateTime(2022, 01, 01))
+                    .And.BeBefore(DateTime.Now);
 
                 // Score
                 statisticResponse.Score.Should().NotBeNull();
-                TestScore(statisticResponse.Score!.A);
-                TestScore(statisticResponse.Score.M);
-                TestScore(statisticResponse.Score.S);
-                TestScore(statisticResponse.Score.D);
+                TestSubScore(statisticResponse.Score!.A);
+                TestSubScore(statisticResponse.Score.M);
+                TestSubScore(statisticResponse.Score.S);
+                TestSubScore(statisticResponse.Score.D);
 
                 // Check for rules that depend on the query parameter
 
@@ -92,7 +94,8 @@ namespace Learning_Platform_Server.Tests
                     statisticResponse.StudentId.Should().NotBeNullOrEmpty();
             }
 
-            static void TestScore(float? score) => score.Should().BeGreaterOrEqualTo(Util.MinimumScore);
+            static void TestSubScore(float? subScore) => subScore.Should()
+                .BeInRange(Util.MinimumScore, Util.MaximumScore);
         }
     }
 }

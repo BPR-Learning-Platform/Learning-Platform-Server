@@ -29,7 +29,7 @@ namespace Learning_Platform_Server.Services
             => _userService.GetByGradeId(gradeId);
 
         public UserResponse GetById(string id)
-            => _userService.GetById(id);
+            => GetUserResponseFromCache(id);
 
         public UserResponse SignInUser(SignInRequest signInRequest)
         {
@@ -63,7 +63,7 @@ namespace Learning_Platform_Server.Services
 
         // helper methods
 
-        public void UpdateCachedUser(UserResponse updatedUserResponse)
+        private void UpdateCachedUser(UserResponse updatedUserResponse)
         {
             UserResponse? userResponse;
 
@@ -80,7 +80,7 @@ namespace Learning_Platform_Server.Services
                 throw new Exception("Cached UserList not found.");
         }
 
-        public UserResponse GetUserResponseFromCache(string userId)
+        private UserResponse GetUserResponseFromCache(string userId)
         {
             UserResponse? userResponse;
 
@@ -110,7 +110,7 @@ namespace Learning_Platform_Server.Services
             return userResponse;
         }
 
-        public void EnsureCaching(UserResponse userResponse)
+        private void EnsureCaching(UserResponse userResponse)
         {
             _logger.Log(LogLevel.Information, "Trying to fetch the list of users from cache.");
 

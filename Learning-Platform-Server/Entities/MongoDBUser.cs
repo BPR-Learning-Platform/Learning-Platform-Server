@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Learning_Platform_Server.Entities
 {
@@ -38,7 +39,8 @@ namespace Learning_Platform_Server.Entities
         }
         public string? Password { get; set; }
         public MongoDbScore? Score { get; set; }
-        public List<int>? assignedgradeids { get; set; } //changed to lowercase to make put user work with database //TODO ?
+        [JsonPropertyName("assignedgradeids")]
+        public List<int>? AssignedGradeIds { get; set; }
 
         public override string ToString()
         {
@@ -47,7 +49,7 @@ namespace Learning_Platform_Server.Entities
                 ", email: " + Email +
                 ", password: " + Password +
                 ", " + Score +
-                ",\n\t" + "assignedGradeIds: \n\t" + (assignedgradeids is not null ? string.Join(",\n\t", assignedgradeids) : "");
+                ",\n\t" + "assignedGradeIds: \n\t" + (AssignedGradeIds is not null ? string.Join(",\n\t", AssignedGradeIds) : "");
 
         }
     }
