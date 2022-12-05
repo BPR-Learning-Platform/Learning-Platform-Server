@@ -37,28 +37,27 @@ namespace Learning_Platform_Server.Services
             Random random = new();
             for (int i = 0; i < Util.BatchSize; i++)
             {
-                bool same = true;
+                bool usable = false;
                 TaskResponse? taskToAdd = null;
                 do
                 {
                     taskToAdd = taskResponseList[random.Next(0, taskResponseList.Count)];
 
                     // not sending tasks that were sent in the previous batch
-                    if (taskToAdd is not null && taskToAdd.TaskId is not null && !previousTaskIds.Contains(taskToAdd.TaskId)
+                    if (taskToAdd?.TaskId is not null
+                        && !previousTaskIds.Contains(taskToAdd.TaskId)
                         // sending unique tasks only
-                        && !taskResponseBatchList.Any(x => x.TaskId is not null && x.TaskId.Equals(taskToAdd.TaskId)))
+                        && !taskResponseBatchList.Any(x => x.TaskId is not null
+                        && x.TaskId.Equals(taskToAdd.TaskId)))
                     {
                         taskResponseBatchList.Add(taskToAdd);
-                        same = false;
+                        usable = true;
                     }
-                } while (same);
+                } while (!usable);
             }
 
             // updating the users score asynchronously each time a new batch request is received
             Task.Run(() => _userService.UpdateUserScore(student, correctInfo));
-
-            // for debugging
-            //Console.WriteLine("taskResponseBatchList: \n\t" + (string.Join(",\n\t", taskResponseBatchList))); // expected to complete before "UpdateUserScore" has completed
 
             return taskResponseBatchList;
         }
@@ -81,8 +80,6 @@ namespace Learning_Platform_Server.Services
             // Difficulty (integer) should be equal to the integral part of the subScore (decimal number)
             // Example: Difficulty should be 2 if subScore is 2.7
             return taskResponse.Difficulty == (int)subScore;
-
-
         }
 
 

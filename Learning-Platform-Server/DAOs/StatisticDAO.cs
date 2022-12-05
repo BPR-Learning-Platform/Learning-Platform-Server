@@ -22,16 +22,16 @@ namespace Learning_Platform_Server.DAOs
 
         public List<StatisticResponse> GetAllByParameter(int? studentId, string? gradeId, int? step)
         {
-            string parameterString = "";
+            string queryString = "";
 
             if (studentId.HasValue)
-                parameterString = "?studentid=" + studentId;
+                queryString = "?studentid=" + studentId;
             else if (gradeId is not null)
-                parameterString = "?gradeid=" + gradeId;
+                queryString = "?gradeid=" + gradeId;
             else if (step.HasValue)
-                parameterString = "?step=" + step;
+                queryString = "?step=" + step;
 
-            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "statistic" + parameterString);
+            HttpRequestMessage httpRequestMessage = new(new HttpMethod("GET"), "statistic" + queryString);
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             List<StatisticResponse> statisticList = new();
