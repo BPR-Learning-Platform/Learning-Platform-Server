@@ -56,7 +56,7 @@ namespace Learning_Platform_Server.Tests
             await using var application = new WebApplicationFactory<Program>();
             using var client = application.CreateClient();
 
-            JsonContent content = JsonContent.Create(new { email = "student20@student.com", password = "wrongpassword" });
+            JsonContent content = JsonContent.Create(new { email = "student3@student.com", password = "wrongpassword" });
             HttpResponseMessage? httpResponseMessage = await client.PostAsync(SignInUrl, content);
 
             _output.WriteLine("Response message content: " + await httpResponseMessage.Content.ReadAsStringAsync());
