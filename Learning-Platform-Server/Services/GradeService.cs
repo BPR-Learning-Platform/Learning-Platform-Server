@@ -1,5 +1,5 @@
-﻿using Learning_Platform_Server.DAOs;
-using Learning_Platform_Server.Helpers;
+﻿using Learning_Platform_Server.Daos;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Users;
 
@@ -15,10 +15,10 @@ namespace Learning_Platform_Server.Services
 
     public class GradeService : IGradeService
     {
-        private readonly IGradeDAO _gradeDAO;
+        private readonly IGradeDao _gradeDAO;
         private readonly IUserService _userService;
 
-        public GradeService(IGradeDAO gradeDAO, IUserService userService)
+        public GradeService(IGradeDao gradeDAO, IUserService userService)
         {
             _gradeDAO = gradeDAO;
             _userService = userService;

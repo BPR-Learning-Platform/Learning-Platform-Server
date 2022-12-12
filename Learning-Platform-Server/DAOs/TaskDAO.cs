@@ -1,21 +1,22 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Tasks;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface ITaskDAO
+    public interface ITaskDao
     {
         List<TaskResponse> GetAll(int step);
     }
 
-    public class TaskDAO : ITaskDAO
+    public class TaskDao : ITaskDao
     {
         private readonly HttpClient _httpClient;
 
-        public TaskDAO(IHttpClientFactory httpClientFactory)
+        public TaskDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }

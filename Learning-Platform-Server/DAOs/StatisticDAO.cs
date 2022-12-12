@@ -1,21 +1,22 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Statistics;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface IStatisticDAO
+    public interface IStatisticDao
     {
         List<StatisticResponse> GetAllByParameter(int? studentId, string? gradeId, int? step);
     }
 
-    public class StatisticDAO : IStatisticDAO
+    public class StatisticDao : IStatisticDao
     {
         private readonly HttpClient _httpClient;
 
-        public StatisticDAO(IHttpClientFactory httpClientFactory)
+        public StatisticDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
@@ -61,7 +62,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string statisticRootJson = MongoDbHelper.MapToJson(statisticRootBsonValue);
 
-            MongoDbStatisticRoot mongoDbStatisticRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatisticRoot>(statisticRootJson) ?? throw new ArgumentNullException(nameof(statisticRootJson));
+            MongoDbStatisticRoot mongoDbStatisticRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatisticRoot>(statisticRootJson) ?? throw new ArgumentException(nameof(statisticRootBsonValue));
 
             return mongoDbStatisticRoot;
         }
@@ -79,7 +80,7 @@ namespace Learning_Platform_Server.DAOs
             {
                 StudentId = userId.NumberLong ?? throw new ArgumentException(nameof(userId.NumberLong)),
                 GradeId = statistic.GradeId ?? throw new ArgumentException(nameof(statistic.Score)),
-                Score = UserDAO.MapToScoreResponse(statistic.Score ?? throw new ArgumentException(nameof(statistic.Score))),
+                Score = UserDao.MapToScoreResponse(statistic.Score ?? throw new ArgumentException(nameof(statistic.Score))),
                 TimeStamp = MongoDbHelper.MapToDateTime(date)
             };
         }

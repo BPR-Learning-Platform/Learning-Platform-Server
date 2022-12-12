@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Learning_Platform_Server.DAOs;
+using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Tasks;
 using Learning_Platform_Server.Models.Users;
@@ -115,7 +115,7 @@ namespace Learning_Platform_Server.Tests
         private static GradeResponse GetGradeResponseAsync(int gradeId)
         {
             IHttpClientFactory? httpClientFactoryMock = TestUtil.GetHttpClientFactoryMock();
-            GradeDAO? gradeDAO = new(httpClientFactoryMock);
+            GradeDao? gradeDAO = new(httpClientFactoryMock);
 
             return gradeDAO.GetById(gradeId);
         }

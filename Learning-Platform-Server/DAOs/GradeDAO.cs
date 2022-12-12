@@ -1,22 +1,23 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Grades;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface IGradeDAO
+    public interface IGradeDao
     {
         List<GradeResponse> GetAll();
         GradeResponse GetById(int id);
     }
 
-    public class GradeDAO : IGradeDAO
+    public class GradeDao : IGradeDao
     {
         private readonly HttpClient _httpClient;
 
-        public GradeDAO(IHttpClientFactory httpClientFactory)
+        public GradeDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }

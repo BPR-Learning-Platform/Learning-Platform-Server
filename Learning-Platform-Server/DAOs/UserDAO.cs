@@ -1,5 +1,6 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using MongoDB.Bson;
@@ -7,9 +8,9 @@ using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface IUserDAO
+    public interface IUserDao
     {
         UserResponse SignInUser(SignInRequest signInRequest);
         UserResponse GetById(string id);
@@ -18,11 +19,11 @@ namespace Learning_Platform_Server.DAOs
         void UpdateUser(UserResponse userResponse);
     }
 
-    public class UserDAO : IUserDAO
+    public class UserDao : IUserDao
     {
         private readonly HttpClient _httpClient;
 
-        public UserDAO(IHttpClientFactory httpClientFactory)
+        public UserDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
@@ -169,7 +170,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string userRootJson = MongoDbHelper.MapToJson(userRootBsonValue);
 
-            MongoDbUserRoot mongoDbUserRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbUserRoot>(userRootJson) ?? throw new ArgumentNullException(nameof(userRootJson));
+            MongoDbUserRoot mongoDbUserRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbUserRoot>(userRootJson) ?? throw new ArgumentException(nameof(userRootBsonValue));
 
             Console.WriteLine("Mapping complete, found: " + mongoDbUserRoot);
 

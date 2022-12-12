@@ -1,15 +1,14 @@
 ﻿using FluentAssertions;
-using Learning_Platform_Server.DAOs;
+using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
-using Xunit.Abstractions;
 
 namespace Learning_Platform_Server.Tests
 {
     [CollectionDefinition("Serial", DisableParallelization = true)] //To avoid TaskControllerTests from failing when running all tests together. More info: https://tsuyoshiushio.medium.com/controlling-the-serial-and-parallel-test-on-xunit-6174326da196
     [Collection("Serial")]
-    public class UserDAOTests
+    public class UserDaoTests
     {
 
         [Fact]
@@ -17,7 +16,7 @@ namespace Learning_Platform_Server.Tests
         {
             string studentId = "124";
             IHttpClientFactory? httpClientFactoryMock = TestUtil.GetHttpClientFactoryMock();
-            UserDAO? userDAO = new(httpClientFactoryMock);
+            UserDao? userDAO = new(httpClientFactoryMock);
 
             UserResponse user = userDAO.GetById(studentId);
 
