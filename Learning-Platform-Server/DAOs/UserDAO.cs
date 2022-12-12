@@ -52,7 +52,7 @@ namespace Learning_Platform_Server.DAOs
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray userRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -73,7 +73,7 @@ namespace Learning_Platform_Server.DAOs
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             List<UserResponse> userList = new();
 
@@ -125,43 +125,44 @@ namespace Learning_Platform_Server.DAOs
         private static void ValidateMongoDbPostRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)
         {
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode);
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode);
 
             string? responseString = httpResponseMessage.Content.ReadAsStringAsync().Result;
             JObject? responseJobject = (JObject?)Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
 
             if (responseJobject is null)
-                throw new Exception();
+                throw new MongoDbException("responseJobject was not found");
 
-            JToken upsertedIdJToken = responseJobject[MongoDbHelper.UpsertedId] ?? throw new UpsertedIdNotFoundException("Database did not create a new user. Maybe the email already existed. Details: " + mongoDbUser);
+            if (responseJobject[MongoDbHelper.UpsertedId] is null)
+                throw new UpsertedIdNotFoundException("Database did not create a new user. Maybe the email already existed. Details: " + mongoDbUser);
         }
 
         private static void ValidateMongoDbPutRequestResponse(MongoDbUser mongoDbUser, HttpResponseMessage httpResponseMessage)
         {
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode);
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode);
 
             string? responseString = httpResponseMessage.Content.ReadAsStringAsync().Result;
             JObject? responseJobject = (JObject?)Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
 
             if (responseJobject is null)
-                throw new Exception();
+                throw new MongoDbException("responseJobject was not found");
 
             JToken? upsertedIdJToken = responseJobject[MongoDbHelper.UpsertedId];
             JToken? matchedCountJToken = responseJobject[MongoDbHelper.MatchedCount];
             JToken? modifiedCountJToken = responseJobject[MongoDbHelper.ModifiedCount];
 
             if (upsertedIdJToken is not null)
-                throw new Exception("Database inserted a new user instead of updating an existing user. Details: " + mongoDbUser);
+                throw new MongoDbException("Database inserted a new user instead of updating an existing user. Details: " + mongoDbUser);
 
             if (matchedCountJToken is null || modifiedCountJToken is null)
-                throw new Exception("Database did not return expected details. The user might not have been updated. Details: " + mongoDbUser);
+                throw new MongoDbException("Database did not return expected details. The user might not have been updated. Details: " + mongoDbUser);
 
             int matchedCount = int.Parse(matchedCountJToken.ToString());
             int modifiedCount = int.Parse(modifiedCountJToken.ToString());
 
             if (matchedCount != 1 || modifiedCount != 1)
-                throw new Exception("Database did not behave as expected. Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
+                throw new MongoDbException("Database did not behave as expected. Details: matchedCount was " + matchedCount + " and modifiedCount was " + modifiedCount + " for the user " + mongoDbUser);
         }
 
         private static MongoDbUserRoot MapToMongoDbUserRoot(BsonValue userRootBsonValue)
@@ -204,7 +205,7 @@ namespace Learning_Platform_Server.DAOs
             static float? parseStringToFloat(string? str)
                 => str is not null ? float.Parse(str, CultureInfo.InvariantCulture) : null;
         }
-        
+
         private static MongoDbScore MapToMongoDbScore(ScoreResponse score)
         {
             return new MongoDbScore()

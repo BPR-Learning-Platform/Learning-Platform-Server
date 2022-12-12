@@ -37,7 +37,7 @@ namespace Learning_Platform_Server.DAOs
             List<StatisticResponse> statisticList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray statisticRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 

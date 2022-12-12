@@ -28,7 +28,7 @@ namespace Learning_Platform_Server.DAOs
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -41,7 +41,7 @@ namespace Learning_Platform_Server.DAOs
             }
 
             if (taskList.Count == 0)
-                throw new Exception("Unable to read any tasks from task collection for step number " + step + " in the database.");
+                throw new MongoDbException("Unable to read any tasks from task collection for step number " + step + " in the database.");
 
             return taskList;
         }
@@ -54,7 +54,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string taskRootJson = MongoDbHelper.MapToJson(taskRootBsonValue);
 
-            MongoDbTaskRoot mongoDbTaskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbTaskRoot>(taskRootJson) ?? throw new ArgumentNullException(nameof(taskRootJson));
+            MongoDbTaskRoot mongoDbTaskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbTaskRoot>(taskRootJson) ?? throw new ArgumentException(nameof(taskRootBsonValue));
 
             return mongoDbTaskRoot;
         }

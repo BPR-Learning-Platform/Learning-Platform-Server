@@ -136,7 +136,7 @@ namespace Learning_Platform_Server.Tests
             UserResponse? userResponse = JsonConvert.DeserializeObject<UserResponse>(userResponseContentString);
 
             userResponse.Should().NotBeNull();
-            return userResponse ?? throw new Exception();
+            return userResponse!;
         }
     }
 }

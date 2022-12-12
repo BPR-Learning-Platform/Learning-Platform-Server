@@ -1,4 +1,5 @@
 ﻿using Learning_Platform_Server.DAOs;
+using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Grades;
 using Learning_Platform_Server.Models.Users;
 
@@ -74,7 +75,7 @@ namespace Learning_Platform_Server.Services
         public int GetStep(UserResponse student)
         {
             if (student.AssignedGradeIds is null || student.AssignedGradeIds.Count == 0)
-                throw new Exception("No assignedgradeids were found for user with userid " + student.UserId);
+                throw new BusinessException("No assignedgradeids were found for user with userid " + student.UserId);
 
             // calling DAO
             List<GradeResponse> gradeResponseList = _gradeDAO.GetAll();
@@ -83,9 +84,9 @@ namespace Learning_Platform_Server.Services
 
             GradeResponse? gradeResponse = gradeResponseList.FirstOrDefault(x => x.GradeId is not null && x.GradeId.Equals(assignedGradeId + ""));
             if (gradeResponse is null)
-                throw new Exception("No grade was found for gradeid " + assignedGradeId);
+                throw new BusinessException("No grade was found for gradeid " + assignedGradeId);
 
-            return gradeResponse.Step ?? throw new Exception($"No step was found for the students grade. Details: {gradeResponse}");
+            return gradeResponse.Step ?? throw new BusinessException($"No step was found for the students grade. Details: {gradeResponse}");
         }
     }
 }

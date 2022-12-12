@@ -29,7 +29,7 @@ namespace Learning_Platform_Server.DAOs
             List<GradeResponse> gradeList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -56,7 +56,7 @@ namespace Learning_Platform_Server.DAOs
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -80,7 +80,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string gradeRootJson = MongoDbHelper.MapToJson(gradeRootBsonValue);
 
-            MongoDbGradeRoot mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson) ?? throw new ArgumentNullException(nameof(gradeRootJson));
+            MongoDbGradeRoot mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson) ?? throw new ArgumentException(nameof(gradeRootBsonValue));
 
             return mongoDbGradeRoot;
         }
