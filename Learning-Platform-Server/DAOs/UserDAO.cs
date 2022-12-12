@@ -204,6 +204,17 @@ namespace Learning_Platform_Server.DAOs
             static float? parseStringToFloat(string? str)
                 => str is not null ? float.Parse(str, CultureInfo.InvariantCulture) : null;
         }
+        
+        private static MongoDbScore MapToMongoDbScore(ScoreResponse score)
+        {
+            return new MongoDbScore()
+            {
+                A = score.A + "",
+                S = score.S + "",
+                M = score.M + "",
+                D = score.D + "",
+            };
+        }
 
         private static MongoDbUser MapToMongoDbUser(UserResponse userResponse)
         {
@@ -216,18 +227,6 @@ namespace Learning_Platform_Server.DAOs
                 AssignedGradeIds = userResponse.AssignedGradeIds ?? throw new ArgumentException(nameof(userResponse.AssignedGradeIds))
             };
         }
-
-        private static MongoDbScore MapToMongoDbScore(ScoreResponse score)
-        {
-            return new MongoDbScore()
-            {
-                A = score.A + "",
-                S = score.S + "",
-                M = score.M + "",
-                D = score.D + "",
-            };
-        }
-
         private static MongoDbUser MapToMongoDbUser(CreateUserRequest createUserRequest)
         {
             return new MongoDbUser()

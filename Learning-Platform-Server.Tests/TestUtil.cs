@@ -3,7 +3,7 @@ using NSubstitute;
 
 namespace Learning_Platform_Server.Tests
 {
-    internal class TestUtil
+    internal static class TestUtil
     {
         // More information on how this works: https://www.thecodebuzz.com/read-appsettings-json-in-net-core-test-project-xunit-mstest/
         private static readonly IConfiguration _configuration = new ConfigurationBuilder()

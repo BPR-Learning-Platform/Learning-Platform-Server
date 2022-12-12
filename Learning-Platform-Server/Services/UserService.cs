@@ -70,7 +70,7 @@ namespace Learning_Platform_Server.Services
                     return subScore;
 
                 int correctNumber = 0;
-                if (scorePoint.Percentage is not null and > 0)
+                if (scorePoint.Percentage is > 0)
                     correctNumber = (int)(scorePoint.Percentage / 100 * scorePoint.Count);
 
                 int incorrectNumber = scorePoint.Count - correctNumber;

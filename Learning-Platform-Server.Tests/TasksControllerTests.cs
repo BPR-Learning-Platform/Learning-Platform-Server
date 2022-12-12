@@ -37,10 +37,10 @@ namespace Learning_Platform_Server.Tests
             gradeId.Should().NotBeNull();
             gradeId.Should().NotBe(0);
 
-            GradeResponse gradeResponse = GetGradeResponseAsync(client, (int)gradeId!);
+            GradeResponse gradeResponse = GetGradeResponseAsync((int)gradeId!);
             _output.WriteLine("Testing with grade: " + gradeResponse);
 
-            string? userId = userResponse?.UserId; // "124";
+            string? userId = userResponse?.UserId; // "124"
 
             string correct = "{%22A%22:{%22count%22:2,%22percentage%22:50},%22M%22:{%22count%22:1,%22percentage%22:100},%22S%22:{%22count%22:0,%22percentage%22:100},%22D%22:{%22count%22:0,%22percentage%22:0}}";
 
@@ -112,7 +112,7 @@ namespace Learning_Platform_Server.Tests
 
         // helper methods
 
-        private static GradeResponse GetGradeResponseAsync(HttpClient client, int gradeId)
+        private static GradeResponse GetGradeResponseAsync(int gradeId)
         {
             IHttpClientFactory? httpClientFactoryMock = TestUtil.GetHttpClientFactoryMock();
             GradeDAO? gradeDAO = new(httpClientFactoryMock);

@@ -30,7 +30,7 @@ namespace Learning_Platform_Server.Services
         {
             UserResponse teacher = _userService.GetById(teacherId);
 
-            if (!(teacher.Type == UserType.T))
+            if (teacher.Type != UserType.T)
                 throw new BadHttpRequestException("The user with id " + teacherId + " has a type that does not represent a teacher. Details: " + teacher);
 
             // if no grades have been assigned to the teacher, return an empty list

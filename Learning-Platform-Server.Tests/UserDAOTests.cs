@@ -11,12 +11,6 @@ namespace Learning_Platform_Server.Tests
     [Collection("Serial")]
     public class UserDAOTests
     {
-        private readonly ITestOutputHelper _output;
-
-        public UserDAOTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
 
         [Fact]
         public void UpdateUser_updates_user_score_correctly()
