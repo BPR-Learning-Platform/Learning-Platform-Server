@@ -8,13 +8,6 @@ namespace Learning_Platform_Server.Tests
 {
     public class TaskServiceTests
     {
-        private readonly ITestOutputHelper _output;
-
-        public TaskServiceTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
         [Fact]
         public void HasAppropiateDifficulty_determines_expected_truth_value()
         {

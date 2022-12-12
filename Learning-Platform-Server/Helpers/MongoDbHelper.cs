@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization;
 
 namespace Learning_Platform_Server.Helpers
 {
-    public class MongoDbHelper
+    public static class MongoDbHelper
     {
         public const string UpsertedId = "upsertedId";
         public const string MatchedCount = "matchedCount";
@@ -19,10 +19,8 @@ namespace Learning_Platform_Server.Helpers
 
         public static string MapToJson(BsonValue bsonValue)
         {
-            {
-                JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };
-                return bsonValue.ToJson(jsonWriterSettings);
-            }
+            JsonWriterSettings jsonWriterSettings = new() { OutputMode = JsonOutputMode.CanonicalExtendedJson };
+            return bsonValue.ToJson(jsonWriterSettings);
         }
 
         public static DateTime MapToDateTime(long date)

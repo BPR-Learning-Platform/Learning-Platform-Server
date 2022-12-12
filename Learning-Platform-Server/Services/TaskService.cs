@@ -29,9 +29,8 @@ namespace Learning_Platform_Server.Services
             UserResponse student = _userService.GetById(studentId);
 
             int step = _gradeService.GetStep(student);
-            List<TaskResponse> taskResponseList = _taskDAO.GetAll(step);
 
-            taskResponseList = _taskDAO.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, student)).ToList();
+            List<TaskResponse> taskResponseList = _taskDAO.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, student)).ToList();
 
             List<TaskResponse> taskResponseBatchList = new();
             Random random = new();
