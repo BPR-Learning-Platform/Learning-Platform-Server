@@ -1,21 +1,22 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Tasks;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface ITaskDAO
+    public interface ITaskDao
     {
         List<TaskResponse> GetAll(int step);
     }
 
-    public class TaskDAO : ITaskDAO
+    public class TaskDao : ITaskDao
     {
         private readonly HttpClient _httpClient;
 
-        public TaskDAO(IHttpClientFactory httpClientFactory)
+        public TaskDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
@@ -28,7 +29,7 @@ namespace Learning_Platform_Server.DAOs
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -41,7 +42,7 @@ namespace Learning_Platform_Server.DAOs
             }
 
             if (taskList.Count == 0)
-                throw new Exception("Unable to read any tasks from task collection for step number " + step + " in the database.");
+                throw new MongoDbException("Unable to read any tasks from task collection for step number " + step + " in the database.");
 
             return taskList;
         }
@@ -54,7 +55,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string taskRootJson = MongoDbHelper.MapToJson(taskRootBsonValue);
 
-            MongoDbTaskRoot mongoDbTaskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbTaskRoot>(taskRootJson) ?? throw new ArgumentNullException(nameof(taskRootJson));
+            MongoDbTaskRoot mongoDbTaskRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbTaskRoot>(taskRootJson) ?? throw new ArgumentException(nameof(taskRootBsonValue));
 
             return mongoDbTaskRoot;
         }

@@ -1,4 +1,4 @@
-﻿using Learning_Platform_Server.DAOs;
+﻿using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Statistics;
 
@@ -13,9 +13,9 @@ namespace Learning_Platform_Server.Services
 
     public class StatisticService : IStatisticService
     {
-        private readonly IStatisticDAO _statisticDAO;
+        private readonly IStatisticDao _statisticDAO;
 
-        public StatisticService(IStatisticDAO statisticDAO)
+        public StatisticService(IStatisticDao statisticDAO)
         {
             _statisticDAO = statisticDAO;
         }

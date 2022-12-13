@@ -1,4 +1,5 @@
-﻿using Learning_Platform_Server.Models.Scores;
+﻿using Learning_Platform_Server.Helpers.CustomExceptions;
+using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -46,7 +47,7 @@ namespace Learning_Platform_Server.Services
         public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo)
         {
             if (userResponse.Score is null)
-                throw new Exception("Score was null");
+                throw new BusinessException("Score was null");
 
             ScoreResponse previousScore = userResponse.Score;
 
@@ -72,12 +73,12 @@ namespace Learning_Platform_Server.Services
                 userResponse = users.FirstOrDefault(x => x.UserId is not null && x.UserId.Equals(updatedUserResponse.UserId));
 
                 if (userResponse is null)
-                    throw new Exception("User id not found in cached UserList.");
+                    throw new CachingException("User id not found in cached UserList.");
 
                 userResponse.Score = updatedUserResponse.Score;
             }
             else
-                throw new Exception("Cached UserList not found.");
+                throw new CachingException("Cached UserList not found.");
         }
 
         private UserResponse GetUserResponseFromCache(string userId)

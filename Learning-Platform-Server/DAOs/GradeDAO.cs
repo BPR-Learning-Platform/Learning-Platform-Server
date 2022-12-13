@@ -1,22 +1,23 @@
 ﻿using Learning_Platform_Server.Entities;
 using Learning_Platform_Server.Helpers;
+using Learning_Platform_Server.Helpers.CustomExceptions;
 using Learning_Platform_Server.Models.Grades;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Learning_Platform_Server.DAOs
+namespace Learning_Platform_Server.Daos
 {
-    public interface IGradeDAO
+    public interface IGradeDao
     {
         List<GradeResponse> GetAll();
         GradeResponse GetById(int id);
     }
 
-    public class GradeDAO : IGradeDAO
+    public class GradeDao : IGradeDao
     {
         private readonly HttpClient _httpClient;
 
-        public GradeDAO(IHttpClientFactory httpClientFactory)
+        public GradeDao(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("MongoDB");
         }
@@ -29,7 +30,7 @@ namespace Learning_Platform_Server.DAOs
             List<GradeResponse> gradeList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -56,7 +57,7 @@ namespace Learning_Platform_Server.DAOs
             HttpResponseMessage httpResponseMessage = _httpClient.SendAsync(httpRequestMessage).Result;
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray gradeRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 
@@ -80,7 +81,7 @@ namespace Learning_Platform_Server.DAOs
         {
             string gradeRootJson = MongoDbHelper.MapToJson(gradeRootBsonValue);
 
-            MongoDbGradeRoot mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson) ?? throw new ArgumentNullException(nameof(gradeRootJson));
+            MongoDbGradeRoot mongoDbGradeRoot = Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbGradeRoot>(gradeRootJson) ?? throw new ArgumentException(nameof(gradeRootBsonValue));
 
             return mongoDbGradeRoot;
         }

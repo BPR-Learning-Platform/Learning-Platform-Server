@@ -1,4 +1,4 @@
-using Learning_Platform_Server.DAOs;
+using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Services;
 using System.Text.Json.Serialization;
@@ -29,10 +29,10 @@ services.AddSwaggerGen();
 
 // configure DI for application services
 
-services.AddScoped<IUserDAO, UserDAO>();
-services.AddScoped<ITaskDAO, TaskDAO>();
-services.AddScoped<IGradeDAO, GradeDAO>();
-services.AddScoped<IStatisticDAO, StatisticDAO>();
+services.AddScoped<IUserDao, UserDao>();
+services.AddScoped<ITaskDao, TaskDao>();
+services.AddScoped<IGradeDao, GradeDao>();
+services.AddScoped<IStatisticDao, StatisticDao>();
 
 services.AddScoped<UserService>();
 services.AddScoped<IUserService, UserServiceWithCache>();

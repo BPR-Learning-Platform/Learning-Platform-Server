@@ -1,4 +1,4 @@
-﻿using Learning_Platform_Server.DAOs;
+﻿using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Users;
@@ -16,9 +16,9 @@ namespace Learning_Platform_Server.Services
 
     public class UserService : IUserService
     {
-        private readonly IUserDAO _userDAO;
+        private readonly IUserDao _userDAO;
 
-        public UserService(IUserDAO userDAO)
+        public UserService(IUserDao userDAO)
         {
             _userDAO = userDAO;
         }

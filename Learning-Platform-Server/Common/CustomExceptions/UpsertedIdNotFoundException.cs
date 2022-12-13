@@ -1,5 +1,6 @@
-﻿namespace Learning_Platform_Server.Helpers
+﻿namespace Learning_Platform_Server.Helpers.CustomExceptions
 {
+    [Serializable]
     public class UpsertedIdNotFoundException : Exception
     {
         public UpsertedIdNotFoundException()

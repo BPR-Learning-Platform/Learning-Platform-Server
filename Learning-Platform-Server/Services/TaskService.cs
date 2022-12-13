@@ -1,4 +1,4 @@
-﻿using Learning_Platform_Server.DAOs;
+﻿using Learning_Platform_Server.Daos;
 using Learning_Platform_Server.Helpers;
 using Learning_Platform_Server.Models.Scores;
 using Learning_Platform_Server.Models.Tasks;
@@ -13,11 +13,11 @@ namespace Learning_Platform_Server.Services
 
     public class TaskService : ITaskService
     {
-        private readonly ITaskDAO _taskDAO;
+        private readonly ITaskDao _taskDAO;
         private readonly IUserService _userService;
         private readonly IGradeService _gradeService;
 
-        public TaskService(ITaskDAO taskDAO, IUserService userService, IGradeService gradeService)
+        public TaskService(ITaskDao taskDAO, IUserService userService, IGradeService gradeService)
         {
             _userService = userService;
             _taskDAO = taskDAO;
