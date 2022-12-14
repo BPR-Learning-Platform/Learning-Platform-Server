@@ -16,9 +16,9 @@ namespace Learning_Platform_Server.Tests
         {
             string studentId = "124";
             IHttpClientFactory? httpClientFactoryMock = TestUtil.GetHttpClientFactoryMock();
-            UserDao? userDAO = new(httpClientFactoryMock);
+            UserDao? userDao = new(httpClientFactoryMock);
 
-            UserResponse user = userDAO.GetById(studentId);
+            UserResponse user = userDao.GetById(studentId);
 
             user.Score.Should().NotBeNull();
             ScoreResponse newScore = new()
@@ -32,11 +32,11 @@ namespace Learning_Platform_Server.Tests
 
             // Update
             user.Score = newScore;
-            userDAO.UpdateUser(user);
+            userDao.UpdateUser(user);
 
 
             // Get
-            UserResponse userAfterUpdate = userDAO.GetById(studentId);
+            UserResponse userAfterUpdate = userDao.GetById(studentId);
 
             userAfterUpdate.Score.Should().NotBeNull();
             // Should have equally named properties with the same value

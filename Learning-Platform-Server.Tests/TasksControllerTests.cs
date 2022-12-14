@@ -115,9 +115,9 @@ namespace Learning_Platform_Server.Tests
         private static GradeResponse GetGradeResponseAsync(int gradeId)
         {
             IHttpClientFactory? httpClientFactoryMock = TestUtil.GetHttpClientFactoryMock();
-            GradeDao? gradeDAO = new(httpClientFactoryMock);
+            GradeDao? gradeDao = new(httpClientFactoryMock);
 
-            return gradeDAO.GetById(gradeId);
+            return gradeDao.GetById(gradeId);
         }
 
         private async Task<UserResponse> GetUserResponseAsync(HttpClient client)
