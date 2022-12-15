@@ -15,17 +15,17 @@ namespace Learning_Platform_Server.Services
 
     public class GradeService : IGradeService
     {
-        private readonly IGradeDao _gradeDAO;
+        private readonly IGradeDao _gradeDao;
         private readonly IUserService _userService;
 
-        public GradeService(IGradeDao gradeDAO, IUserService userService)
+        public GradeService(IGradeDao gradeDao, IUserService userService)
         {
-            _gradeDAO = gradeDAO;
+            _gradeDao = gradeDao;
             _userService = userService;
         }
 
         public List<GradeResponse> GetAll()
-            => _gradeDAO.GetAll();
+            => _gradeDao.GetAll();
 
         public List<GradeResponseToTeacher> GetAllToTeacher(string teacherId)
         {
@@ -66,7 +66,7 @@ namespace Learning_Platform_Server.Services
         }
 
         public GradeResponse GetById(int id)
-            => _gradeDAO.GetById(id);
+            => _gradeDao.GetById(id);
 
 
 
@@ -77,8 +77,8 @@ namespace Learning_Platform_Server.Services
             if (student.AssignedGradeIds is null || student.AssignedGradeIds.Count == 0)
                 throw new BusinessException("No assignedgradeids were found for user with userid " + student.UserId);
 
-            // calling DAO
-            List<GradeResponse> gradeResponseList = _gradeDAO.GetAll();
+            // calling Dao
+            List<GradeResponse> gradeResponseList = _gradeDao.GetAll();
 
             int assignedGradeId = student.AssignedGradeIds[0];
 

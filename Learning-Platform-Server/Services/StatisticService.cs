@@ -13,19 +13,19 @@ namespace Learning_Platform_Server.Services
 
     public class StatisticService : IStatisticService
     {
-        private readonly IStatisticDao _statisticDAO;
+        private readonly IStatisticDao _statisticDao;
 
-        public StatisticService(IStatisticDao statisticDAO)
+        public StatisticService(IStatisticDao statisticDao)
         {
-            _statisticDAO = statisticDAO;
+            _statisticDao = statisticDao;
         }
 
         public List<StatisticResponse> GetAllByStudentId(int studentId)
-            => _statisticDAO.GetAllByParameter(studentId, null, null);
+            => _statisticDao.GetAllByParameter(studentId, null, null);
 
         public List<StatisticResponse> GetAllByGradeId(string gradeId)
         {
-            List<StatisticResponse>? statisticListForTheGrade = _statisticDAO.GetAllByParameter(null, gradeId, null);
+            List<StatisticResponse>? statisticListForTheGrade = _statisticDao.GetAllByParameter(null, gradeId, null);
 
             List<StatisticResponse> statisticListWithAvgScores = GetAvg(statisticListForTheGrade, gradeId);
 
@@ -33,7 +33,7 @@ namespace Learning_Platform_Server.Services
         }
         public List<StatisticResponse> GetAllByStep(int step, string gradeIdToExclude)
         {
-            List<StatisticResponse>? statisticListForStep = _statisticDAO.GetAllByParameter(null, null, step);
+            List<StatisticResponse>? statisticListForStep = _statisticDao.GetAllByParameter(null, null, step);
 
             List<StatisticResponse> statisticListForStepWithoutGrade = statisticListForStep.Where(x => x.GradeId is not null && !x.GradeId.Equals(gradeIdToExclude)).ToList();
             Console.WriteLine("statisticListForStepWithoutGrade: " + string.Join(",\n\t", statisticListForStepWithoutGrade));

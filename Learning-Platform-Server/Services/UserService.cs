@@ -16,24 +16,24 @@ namespace Learning_Platform_Server.Services
 
     public class UserService : IUserService
     {
-        private readonly IUserDao _userDAO;
+        private readonly IUserDao _userDao;
 
-        public UserService(IUserDao userDAO)
+        public UserService(IUserDao userDao)
         {
-            _userDAO = userDAO;
+            _userDao = userDao;
         }
 
         public UserResponse SignInUser(SignInRequest signInRequest)
-            => _userDAO.SignInUser(signInRequest);
+            => _userDao.SignInUser(signInRequest);
 
         public UserResponse GetById(string id)
-            => _userDAO.GetById(id);
+            => _userDao.GetById(id);
 
         public List<UserResponse> GetByGradeId(int gradeId)
-            => _userDAO.GetByGradeId(gradeId);
+            => _userDao.GetByGradeId(gradeId);
 
         public void Create(CreateUserRequest createUserRequest)
-            => _userDAO.Create(createUserRequest);
+            => _userDao.Create(createUserRequest);
 
         public UserResponse UpdateUserScore(UserResponse userResponse, CorrectInfo correctInfo)
         {
@@ -42,8 +42,8 @@ namespace Learning_Platform_Server.Services
 
             userResponse.Score = CalculateNewScore(userResponse.Score, correctInfo);
 
-            // calling DAO
-            _userDAO.UpdateUser(userResponse);
+            // calling Dao
+            _userDao.UpdateUser(userResponse);
 
             return userResponse;
         }

@@ -29,7 +29,8 @@ namespace Learning_Platform_Server.Daos
             List<TaskResponse> taskList = new();
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-                throw new MongoDbException("Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
+                throw new MongoDbException(
+                    "Database answered with statuscode " + httpResponseMessage.StatusCode + ".");
 
             BsonArray taskRootBsonArray = MongoDbHelper.MapToBsonArray(httpResponseMessage);
 

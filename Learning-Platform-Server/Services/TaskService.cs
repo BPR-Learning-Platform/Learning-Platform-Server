@@ -13,14 +13,14 @@ namespace Learning_Platform_Server.Services
 
     public class TaskService : ITaskService
     {
-        private readonly ITaskDao _taskDAO;
+        private readonly ITaskDao _taskDao;
         private readonly IUserService _userService;
         private readonly IGradeService _gradeService;
 
-        public TaskService(ITaskDao taskDAO, IUserService userService, IGradeService gradeService)
+        public TaskService(ITaskDao taskDao, IUserService userService, IGradeService gradeService)
         {
             _userService = userService;
-            _taskDAO = taskDAO;
+            _taskDao = taskDao;
             _gradeService = gradeService;
         }
 
@@ -30,7 +30,7 @@ namespace Learning_Platform_Server.Services
 
             int step = _gradeService.GetStep(student);
 
-            List<TaskResponse> taskResponseList = _taskDAO.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, student)).ToList();
+            List<TaskResponse> taskResponseList = _taskDao.GetAll(step).Where(taskResponse => TaskHasAppropiateDifficulty(taskResponse, student)).ToList();
 
             List<TaskResponse> taskResponseBatchList = new();
             Random random = new();
@@ -64,15 +64,15 @@ namespace Learning_Platform_Server.Services
         public static bool TaskHasAppropiateDifficulty(TaskResponse taskResponse, UserResponse userResponse)
         {
             if (userResponse.Score is null)
-                throw new ArgumentException($"No score was found for the user parameter {nameof(userResponse)}. Details: {userResponse}");
+                throw new ArgumentException($"No score was found for the user parameter. Details: {userResponse}", nameof(userResponse));
             ScoreResponse score = userResponse.Score;
 
             float subScore = taskResponse.Type switch
             {
-                TaskType.A => score.A ?? throw new ArgumentException(nameof(score.A)),
-                TaskType.S => score.S ?? throw new ArgumentException(nameof(score.S)),
-                TaskType.M => score.M ?? throw new ArgumentException(nameof(score.M)),
-                TaskType.D => score.D ?? throw new ArgumentException(nameof(score.D)),
+                TaskType.A => score.A ?? throw new InvalidOperationException($"{nameof(score.A)} was null"),
+                TaskType.S => score.S ?? throw new InvalidOperationException($"{nameof(score.S)} was null"),
+                TaskType.M => score.M ?? throw new InvalidOperationException($"{nameof(score.M)} was null"),
+                TaskType.D => score.D ?? throw new InvalidOperationException($"{nameof(score.D)} was null"),
                 _ => throw new ArgumentException("Invalid enum value for the Type attribute of the TaskResponse object", nameof(taskResponse))
             };
 
